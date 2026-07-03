@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Habit Tracker</title>
+<style>
+  :root{
+    --bg:#faf4ec;
+    --ink:#4a72b0;
+    --ink-strong:#3a5c92;
+    --line:#c7d6ec;
+    --line-strong:#4a72b0;
+    --surface:#ffffff;
+    --check:#4a72b0;
+    --muted:#8fa6c9;
+  }
+  body.dark{
+    --bg:#161a22;
+    --ink:#8fb2e8;
+    --ink-strong:#bcd4f7;
+    --line:#2b3346;
+    --line-strong:#5b83c4;
+    --surface:#1d2330;
+    --check:#8fb2e8;
+    --muted:#5c6c8a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink-strong);
+    font-family:'Georgia', 'Times New Roman', serif;
+    padding:30px 16px 60px;
+    transition:background .25s ease, color .25s ease;
+  }
+  .sheet{
+    max-width:1100px;
+    margin:0 auto;
+  }
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:26px;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  h1{
+    font-size:52px;
+    line-height:0.95;
+    font-weight:700;
+    color:var(--ink);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .right-controls{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:12px;
+  }
+  .mode-toggle{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:Arial, sans-serif;
+    font-size:11px;
+    font-weight:600;
+    color:var(--ink);
+  }
+  .mode-toggle button{
+    border:1.5px solid var(--line-strong);
+    background:transparent;
+    color:var(--ink);
+    padding:6px 12px;
+    font-size:11px;
+    font-weight:700;
+    font-family:Arial, sans-serif;
+    cursor:pointer;
+    border-radius:20px;
+    letter-spacing:.02em;
+  }
+  .mode-toggle button.active{
+    background:var(--ink);
+    color:var(--bg);
+  }
+  .date-box{
+    text-align:right;
+  }
+  .date-box label{
+    font-family:Arial, sans-serif;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink);
+    display:block;
+    margin-bottom:4px;
+  }
+  .date-box .date-display{
+    border:1.5px solid var(--line-strong);
+    padding:8px 14px;
+    font-family:Arial, sans-serif;
+    font-size:13px;
+    color:var(--ink-strong);
+    min-width:170px;
+  }
+  .month-nav{
+    border:none;
+    background:transparent;
+    color:var(--ink);
+    font-size:16px;
+    cursor:pointer;
+    padding:0 4px;
+    font-family:Arial, sans-serif;
+  }
+  .month-nav:hover{ color:var(--ink-strong); }
+  .month-nav:disabled{ opacity:0.3; cursor:default; }
+  .grid-wrap{
+    overflow-x:auto;
+    margin-bottom:30px;
+  }
+  table{
+    border-collapse:collapse;
+    width:100%;
+  }
+  thead th{
+    font-family:Arial, sans-serif;
+    font-size:11px;
+    font-weight:600;
+    color:var(--ink);
+    border:1px solid var(--line);
+    width:26px;
+    height:26px;
+    text-align:center;
+  }
+  thead th.today{
+    background:var(--line);
+    border-radius:3px;
+  }
+  thead th.label-col{ border:none; width:130px; }
+  thead th.section-label{
+    background:var(--line-strong);
+    color:var(--bg);
+    border:1px solid var(--line-strong);
+    text-align:left;
+    padding-left:10px;
+    letter-spacing:.04em;
+  }
+  tbody td.label-cell{
+    font-family:Arial, sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    text-align:right;
+    padding-right:16px;
+    letter-spacing:.03em;
+    white-space:nowrap;
+  }
+  tbody td.label-cell input{
+    border:none;
+    outline:none;
+    background:transparent;
+    font-family:Arial, sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color:var(--ink);
+    text-align:right;
+    width:100%;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  tbody td.cell{
+    border:1px solid var(--line);
+    height:32px;
+    width:26px;
+    text-align:center;
+    cursor:pointer;
+    font-family:Arial, sans-serif;
+    font-size:14px;
+    font-weight:700;
+    color:var(--check);
+    user-select:none;
+  }
+  tbody td.cell.today{
+    background:rgba(74,114,176,0.06);
+  }
+  tbody td.cell.future{
+    cursor:not-allowed;
+    opacity:0.35;
+  }
+  .row-actions{
+    display:flex;
+    gap:8px;
+    margin:-18px 0 30px;
+    font-family:Arial, sans-serif;
+  }
+  .btn{
+    border:1.2px solid var(--line-strong);
+    background:transparent;
+    color:var(--ink);
+    padding:6px 12px;
+    font-size:11px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:Arial, sans-serif;
+    border-radius:4px;
+  }
+  .btn:hover{ background:var(--line); }
+  .sleep-summary{
+    font-family:Arial, sans-serif;
+    font-size:12px;
+    color:var(--ink);
+    margin-top:8px;
+  }
+  .notes-box{
+    border:1px solid var(--line-strong);
+    padding:10px 14px 4px;
+    font-family:Arial, sans-serif;
+  }
+  .notes-box .notes-title{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    letter-spacing:.03em;
+    margin-bottom:8px;
+  }
+  .notes-box input{
+    display:block;
+    width:100%;
+    border:none;
+    border-bottom:1px solid var(--line);
+    outline:none;
+    background:transparent;
+    font-family:Arial, sans-serif;
+    font-size:13px;
+    color:var(--ink-strong);
+    padding:8px 0;
+    margin-bottom:2px;
+  }
+  .footer{
+    margin-top:24px;
+    padding-top:16px;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:18px;
+    font-family:Arial, sans-serif;
+  }
+  .footer a{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink);
+    text-decoration:none;
+    border:1px solid var(--line-strong);
+    padding:6px 12px;
+    border-radius:20px;
+  }
+  .footer a:hover{ background:var(--line); }
+  .status{
+    text-align:center;
+    font-family:Arial, sans-serif;
+    font-size:10px;
+    color:var(--muted);
+    margin-top:16px;
+  }
+  tbody tr.habit-row{
+    cursor:grab;
+  }
+  tbody tr.habit-row.dragging{
+    opacity:0.4;
+  }
+  tbody tr.habit-row.drag-over td{
+    border-top:2px solid var(--ink);
+  }
+  .context-menu{
+    position:fixed;
+    z-index:50;
+    background:var(--surface);
+    border:1px solid var(--line-strong);
+    border-radius:6px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.25);
+    padding:4px;
+    font-family:Arial, sans-serif;
+    font-size:12px;
+  }
+  .context-menu button{
+    display:block;
+    width:100%;
+    text-align:left;
+    border:none;
+    background:transparent;
+    color:#c0392b;
+    padding:7px 14px;
+    cursor:pointer;
+    font-family:Arial, sans-serif;
+    font-size:12px;
+    font-weight:600;
+    border-radius:4px;
+    white-space:nowrap;
+  }
+  .context-menu button:hover{ background:var(--line); }
+  .undo-toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--ink-strong);
+    color:var(--bg);
+    padding:10px 16px;
+    border-radius:8px;
+    font-family:Arial, sans-serif;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    z-index:60;
+    box-shadow:0 4px 14px rgba(0,0,0,0.3);
+  }
+  .undo-toast button{
+    border:1px solid var(--bg);
+    background:transparent;
+    color:var(--bg);
+    padding:4px 10px;
+    border-radius:14px;
+    font-weight:700;
+    font-size:11px;
+    cursor:pointer;
+    font-family:Arial, sans-serif;
+  }
+  @media (max-width:640px){
+    h1{ font-size:38px; }
+    .topbar{ flex-direction:column; }
+    .right-controls{ align-items:flex-start; }
+    .date-box{ text-align:left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <div class="topbar">
+    <h1>habit<br>tracker</h1>
+    <div class="right-controls">
+      <div class="mode-toggle">
+        <button id="lightBtn">LIGHT</button>
+        <button id="darkBtn">DARK</button>
+      </div>
+      <div class="date-box">
+        <label>MONTH</label>
+        <div class="date-display" id="monthDisplay" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <button id="prevMonth" class="month-nav">‹</button>
+          <span id="monthLabel"></span>
+          <button id="nextMonth" class="month-nav">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-wrap">
+    <table id="habitsTable">
+      <thead><tr id="habitsHead"><th class="label-col section-label">HABITS / DAYS</th></tr></thead>
+      <tbody id="habitsBody"></tbody>
+    </table>
+  </div>
+  <div class="row-actions">
+    <button class="btn" id="addHabit">+ Add habit</button>
+  </div>
+
+  <div class="grid-wrap">
+    <table id="sleepTable">
+      <thead><tr id="sleepHead"><th class="label-col section-label">SLEEP</th></tr></thead>
+      <tbody id="sleepBody"></tbody>
+    </table>
+  </div>
+  <div class="sleep-summary" id="sleepSummary">Average sleep this month: —</div>
+
+  <div class="notes-box">
+    <div class="notes-title">NOTES :</div>
+    <input data-note="0" placeholder="">
+    <input data-note="1" placeholder="">
+  </div>
+
+  <div class="footer">
+    <a id="igLink" href="https://www.instagram.com/niloy.39/" target="_blank" rel="noopener">Instagram</a>
+    <a id="xLink" href="https://x.com/niloy_39" target="_blank" rel="noopener">X</a>
+  </div>
+
+  <div class="status" id="status">Loading…</div>
+</div>
+
+<script>
+const MONTHS_KEY = "habit-tracker-months-v3";
+const META_KEY = "habit-tracker-meta-v3";
+const REAL_TODAY = new Date();
+const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const SLEEP_LABELS = ["9 hrs","8 hrs","7 hrs","6 hrs","5 hrs"];
+const SLEEP_VALUES = [9,8,7,6,5];
+
+let habitLabels = ["Diet","Water","Workout 1","Workout 2","Book","Study"];
+let theme = "dark";
+let monthsData = {}; // keyed by "YYYY-M" -> { habitMarks:[[...]], sleepMarks:[[...]], notes:["",""] }
+let viewDate = new Date(REAL_TODAY.getFullYear(), REAL_TODAY.getMonth(), 1);
+
+function monthKey(d){ return d.getFullYear() + "-" + (d.getMonth()+1); }
+function daysIn(d){ return new Date(d.getFullYear(), d.getMonth()+1, 0).getDate(); }
+function isRealCurrentMonth(d){ return monthKey(d) === monthKey(REAL_TODAY); }
+
+function getMonthData(d){
+  const key = monthKey(d);
+  const n = daysIn(d);
+  if(!monthsData[key]) monthsData[key] = { habitMarks:[], sleepMarks:[], notes:["",""] };
+  const md = monthsData[key];
+  habitLabels.forEach((_, i) => {
+    if(!md.habitMarks[i] || md.habitMarks[i].length !== n) md.habitMarks[i] = Array(n).fill(false);
+  });
+  for(let i=0;i<SLEEP_LABELS.length;i++){
+    if(!md.sleepMarks[i] || md.sleepMarks[i].length !== n) md.sleepMarks[i] = Array(n).fill(false);
+  }
+  if(!md.notes) md.notes = ["",""];
+  return md;
+}
+
+function buildHead(rowId, count, todayDate){
+  const row = document.getElementById(rowId);
+  row.querySelectorAll("th.day-th").forEach(th => th.remove());
+  for(let d=1; d<=count; d++){
+    const th = document.createElement("th");
+    th.textContent = d;
+    th.className = "day-th";
+    if(d === todayDate) th.classList.add("today");
+    row.appendChild(th);
+  }
+}
+
+function renderMonthLabel(){
+  document.getElementById("monthLabel").textContent = MONTH_NAMES[viewDate.getMonth()] + " " + viewDate.getFullYear();
+  document.getElementById("nextMonth").disabled = isRealCurrentMonth(viewDate);
+}
+
+function renderHabits(){
+  const n = daysIn(viewDate);
+  const todayDate = isRealCurrentMonth(viewDate) ? REAL_TODAY.getDate() : -1;
+  buildHead("habitsHead", n, todayDate);
+  const md = getMonthData(viewDate);
+  const body = document.getElementById("habitsBody");
+  body.innerHTML = "";
+  habitLabels.forEach((label, hi) => {
+    const tr = document.createElement("tr");
+    tr.className = "habit-row";
+    tr.draggable = true;
+    tr.dataset.index = hi;
+
+    tr.addEventListener("dragstart", e => {
+      tr.classList.add("dragging");
+      e.dataTransfer.setData("text/plain", hi);
+    });
+    tr.addEventListener("dragend", () => tr.classList.remove("dragging"));
+    tr.addEventListener("dragover", e => { e.preventDefault(); tr.classList.add("drag-over"); });
+    tr.addEventListener("dragleave", () => tr.classList.remove("drag-over"));
+    tr.addEventListener("drop", e => {
+      e.preventDefault();
+      tr.classList.remove("drag-over");
+      const fromIndex = +e.dataTransfer.getData("text/plain");
+      const toIndex = +tr.dataset.index;
+      if(fromIndex === toIndex) return;
+      reorderHabit(fromIndex, toIndex);
+    });
+    tr.addEventListener("contextmenu", e => {
+      e.preventDefault();
+      showContextMenu(e.clientX, e.clientY, hi);
+    });
+
+    const labelTd = document.createElement("td");
+    labelTd.className = "label-cell";
+    const input = document.createElement("input");
+    input.value = label;
+    input.addEventListener("input", e => { habitLabels[hi] = e.target.value; save(); });
+    labelTd.appendChild(input);
+    tr.appendChild(labelTd);
+
+    for(let d=0; d<n; d++){
+      const isFuture = todayDate !== -1 && (d+1) > todayDate;
+      const td = document.createElement("td");
+      td.className = "cell" + (d+1 === todayDate ? " today" : "") + (isFuture ? " future" : "");
+      td.textContent = md.habitMarks[hi][d] ? "✓" : "";
+      if(!isFuture){
+        td.addEventListener("click", () => {
+          md.habitMarks[hi][d] = !md.habitMarks[hi][d];
+          td.textContent = md.habitMarks[hi][d] ? "✓" : "";
+          save();
+        });
+      }
+      tr.appendChild(td);
+    }
+    body.appendChild(tr);
+  });
+}
+
+function reorderHabit(fromIndex, toIndex){
+  const [movedLabel] = habitLabels.splice(fromIndex, 1);
+  habitLabels.splice(toIndex, 0, movedLabel);
+  Object.values(monthsData).forEach(md => {
+    if(md.habitMarks && md.habitMarks[fromIndex]){
+      const [movedMarks] = md.habitMarks.splice(fromIndex, 1);
+      md.habitMarks.splice(toIndex, 0, movedMarks);
+    }
+  });
+  renderHabits();
+  save();
+}
+
+let contextMenuEl = null;
+function closeContextMenu(){
+  if(contextMenuEl){ contextMenuEl.remove(); contextMenuEl = null; }
+}
+function showContextMenu(x, y, hi){
+  closeContextMenu();
+  const menu = document.createElement("div");
+  menu.className = "context-menu";
+  menu.style.left = x + "px";
+  menu.style.top = y + "px";
+  const delBtn = document.createElement("button");
+  delBtn.textContent = "Delete habit";
+  delBtn.addEventListener("click", () => {
+    deleteHabit(hi);
+    closeContextMenu();
+  });
+  menu.appendChild(delBtn);
+  document.body.appendChild(menu);
+  contextMenuEl = menu;
+}
+document.addEventListener("click", closeContextMenu);
+
+let undoTimer = null;
+let undoData = null;
+function deleteHabit(hi){
+  undoData = {
+    index: hi,
+    label: habitLabels[hi],
+    marksByMonth: {}
+  };
+  Object.keys(monthsData).forEach(key => {
+    const md = monthsData[key];
+    if(md.habitMarks && md.habitMarks[hi]){
+      undoData.marksByMonth[key] = md.habitMarks[hi];
+    }
+  });
+
+  habitLabels.splice(hi, 1);
+  Object.values(monthsData).forEach(md => {
+    if(md.habitMarks) md.habitMarks.splice(hi, 1);
+  });
+  renderHabits();
+  save();
+  showUndoToast();
+}
+
+function showUndoToast(){
+  removeUndoToast();
+  const toast = document.createElement("div");
+  toast.className = "undo-toast";
+  toast.id = "undoToast";
+  const label = document.createElement("span");
+  label.textContent = "Habit deleted";
+  const btn = document.createElement("button");
+  btn.textContent = "Undo";
+  btn.addEventListener("click", undoDelete);
+  toast.appendChild(label);
+  toast.appendChild(btn);
+  document.body.appendChild(toast);
+  undoTimer = setTimeout(removeUndoToast, 10000);
+}
+function removeUndoToast(){
+  clearTimeout(undoTimer);
+  const el = document.getElementById("undoToast");
+  if(el) el.remove();
+}
+function undoDelete(){
+  if(!undoData) return;
+  habitLabels.splice(undoData.index, 0, undoData.label);
+  Object.keys(undoData.marksByMonth).forEach(key => {
+    if(monthsData[key] && monthsData[key].habitMarks){
+      monthsData[key].habitMarks.splice(undoData.index, 0, undoData.marksByMonth[key]);
+    }
+  });
+  undoData = null;
+  removeUndoToast();
+  renderHabits();
+  save();
+}
+
+function renderSleep(){
+  const n = daysIn(viewDate);
+  const todayDate = isRealCurrentMonth(viewDate) ? REAL_TODAY.getDate() : -1;
+  buildHead("sleepHead", n, todayDate);
+  const md = getMonthData(viewDate);
+  const body = document.getElementById("sleepBody");
+  body.innerHTML = "";
+  SLEEP_LABELS.forEach((label, si) => {
+    const tr = document.createElement("tr");
+    const labelTd = document.createElement("td");
+    labelTd.className = "label-cell";
+    labelTd.textContent = label;
+    tr.appendChild(labelTd);
+
+    for(let d=0; d<n; d++){
+      const isFuture = todayDate !== -1 && (d+1) > todayDate;
+      const td = document.createElement("td");
+      td.className = "cell" + (d+1 === todayDate ? " today" : "") + (isFuture ? " future" : "");
+      td.textContent = md.sleepMarks[si][d] ? "✓" : "";
+      if(!isFuture){
+        td.addEventListener("click", () => {
+          SLEEP_LABELS.forEach((_, oi) => { if(oi !== si) md.sleepMarks[oi][d] = false; });
+          md.sleepMarks[si][d] = !md.sleepMarks[si][d];
+          renderSleep();
+          save();
+        });
+      }
+      tr.appendChild(td);
+    }
+    body.appendChild(tr);
+  });
+  updateSleepSummary(md, n);
+}
+
+function updateSleepSummary(md, n){
+  let total = 0, count = 0;
+  for(let d=0; d<n; d++){
+    for(let si=0; si<SLEEP_LABELS.length; si++){
+      if(md.sleepMarks[si][d]){ total += SLEEP_VALUES[si]; count++; break; }
+    }
+  }
+  const el = document.getElementById("sleepSummary");
+  el.textContent = count > 0
+    ? "Average sleep this month: " + (total/count).toFixed(1) + " hrs (" + count + " day" + (count>1?"s":"") + " logged)"
+    : "Average sleep this month: —";
+}
+
+function renderNotes(){
+  const md = getMonthData(viewDate);
+  document.querySelectorAll(".notes-box input").forEach(inp => {
+    inp.value = md.notes[+inp.dataset.note] || "";
+  });
+}
+
+function renderAll(){
+  renderMonthLabel();
+  renderHabits();
+  renderSleep();
+  renderNotes();
+}
+
+document.getElementById("addHabit").addEventListener("click", () => {
+  habitLabels.push("New habit");
+  renderHabits(); save();
+});
+document.querySelectorAll(".notes-box input").forEach(inp => {
+  inp.addEventListener("input", e => {
+    const md = getMonthData(viewDate);
+    md.notes[+e.target.dataset.note] = e.target.value;
+    save();
+  });
+});
+document.getElementById("prevMonth").addEventListener("click", () => {
+  viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth()-1, 1);
+  renderAll();
+});
+document.getElementById("nextMonth").addEventListener("click", () => {
+  if(isRealCurrentMonth(viewDate)) return;
+  viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth()+1, 1);
+  renderAll();
+});
+
+function applyTheme(){
+  document.body.classList.toggle("dark", theme === "dark");
+  document.getElementById("darkBtn").classList.toggle("active", theme === "dark");
+  document.getElementById("lightBtn").classList.toggle("active", theme === "light");
+}
+document.getElementById("lightBtn").addEventListener("click", () => { theme = "light"; applyTheme(); save(); });
+document.getElementById("darkBtn").addEventListener("click", () => { theme = "dark"; applyTheme(); save(); });
+
+let saveTimer = null;
+function save(){
+  const statusEl = document.getElementById("status");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try{
+      localStorage.setItem(MONTHS_KEY, JSON.stringify(monthsData));
+      localStorage.setItem(META_KEY, JSON.stringify({ theme, habitLabels }));
+      statusEl.textContent = "Saved";
+    }catch(err){
+      statusEl.textContent = "Save failed";
+    }
+  }, 300);
+}
+
+async function load(){
+  const statusEl = document.getElementById("status");
+  try{
+    const monthsRaw = localStorage.getItem(MONTHS_KEY);
+    if(monthsRaw) monthsData = JSON.parse(monthsRaw);
+  }catch(err){ /* no saved months yet */ }
+  try{
+    const metaRaw = localStorage.getItem(META_KEY);
+    if(metaRaw){
+      const meta = JSON.parse(metaRaw);
+      if(meta.theme) theme = meta.theme;
+      if(meta.habitLabels) habitLabels = meta.habitLabels;
+    }
+  }catch(err){ /* no saved meta yet */ }
+  statusEl.textContent = "Ready";
+  applyTheme();
+  renderAll();
+}
+
+load();
+</script>
+</body>
+</html>
