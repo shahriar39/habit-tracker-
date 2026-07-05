@@ -270,6 +270,81 @@
   tbody tr.habit-row{
     cursor:grab;
   }
+  .auth-overlay{
+    position:fixed;
+    inset:0;
+    background:var(--bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    font-family:Arial, sans-serif;
+  }
+  .auth-card{
+    background:var(--surface);
+    border:1.5px solid var(--line-strong);
+    border-radius:8px;
+    padding:32px 28px;
+    width:270px;
+  }
+  .auth-card h2{
+    margin:0 0 18px;
+    color:var(--ink);
+    font-family:'Georgia', serif;
+    font-size:26px;
+  }
+  .auth-card input{
+    display:block;
+    width:100%;
+    margin-bottom:10px;
+    padding:9px 10px;
+    border:1px solid var(--line-strong);
+    border-radius:4px;
+    background:transparent;
+    color:var(--ink-strong);
+    font-family:Arial, sans-serif;
+    font-size:13px;
+    outline:none;
+  }
+  .auth-submit{
+    width:100%;
+    background:var(--ink);
+    color:var(--bg);
+    border:none;
+    padding:10px;
+    border-radius:4px;
+    font-weight:700;
+    cursor:pointer;
+    margin-top:4px;
+    font-family:Arial, sans-serif;
+    font-size:13px;
+  }
+  .auth-submit:disabled{ opacity:0.6; cursor:default; }
+  .auth-switch{
+    font-size:12px;
+    margin-top:16px;
+    color:var(--muted);
+    text-align:center;
+  }
+  .auth-switch a{ color:var(--ink); cursor:pointer; text-decoration:underline; }
+  .auth-error{
+    color:#c0392b;
+    font-size:12px;
+    margin-bottom:10px;
+    min-height:14px;
+  }
+  .logout-btn{
+    border:1px solid var(--line-strong);
+    background:transparent;
+    color:var(--ink);
+    font-size:11px;
+    font-weight:700;
+    padding:6px 12px;
+    border-radius:20px;
+    cursor:pointer;
+    font-family:Arial, sans-serif;
+  }
+  .logout-btn:hover{ background:var(--line); }
   tbody tr.habit-row.dragging{
     opacity:0.4;
   }
@@ -341,13 +416,26 @@
 </head>
 <body>
 
-<div class="sheet">
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-card">
+    <h2 id="authTitle">Log in</h2>
+    <div class="auth-error" id="authError"></div>
+    <input id="authUsername" placeholder="Username" autocomplete="username">
+    <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password">
+    <p style="font-size:11px;color:var(--muted);margin:-4px 0 10px;">Username: 3+ characters. Password: 6+ characters with letters and numbers.</p>
+    <button class="auth-submit" id="authSubmit">Log in</button>
+    <p class="auth-switch">Don't have an account? <a id="authSwitchLink">Sign up</a></p>
+  </div>
+</div>
+
+<div class="sheet" id="appSheet" style="display:none">
   <div class="topbar">
     <h1>habit<br>tracker</h1>
     <div class="right-controls">
       <div class="mode-toggle">
         <button id="lightBtn">LIGHT</button>
         <button id="darkBtn">DARK</button>
+        <button id="logoutBtn" class="logout-btn">LOG OUT</button>
       </div>
       <div class="date-box">
         <label>MONTH</label>
@@ -392,9 +480,122 @@
   <div class="status" id="status">Loading…</div>
 </div>
 
-<script>
-const MONTHS_KEY = "habit-tracker-months-v3";
-const META_KEY = "habit-tracker-meta-v3";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB8787NWs9vv5ZgMvXEWRHXlB8hwZGi17s",
+  authDomain: "habit-tracker-62d96.firebaseapp.com",
+  projectId: "habit-tracker-62d96",
+  storageBucket: "habit-tracker-62d96.firebasestorage.app",
+  messagingSenderId: "60248818274",
+  appId: "1:60248818274:web:c59e0e1fadd593965d873b"
+};
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+let currentUid = null;
+
+function usernameToEmail(username){
+  return username.trim().toLowerCase().replace(/\s+/g, "") + "@habittracker.local";
+}
+function friendlyAuthError(err){
+  const code = err.code || "";
+  if(code.includes("email-already-in-use")) return "That username is already taken.";
+  if(code.includes("weak-password")) return "Password must be at least 6 characters.";
+  if(code.includes("invalid-credential") || code.includes("wrong-password") || code.includes("user-not-found")) return "Incorrect username or password.";
+  if(code.includes("invalid-email")) return "Please enter a valid username (letters/numbers only).";
+  return "Something went wrong. Please try again.";
+}
+
+let authMode = "login";
+function setAuthMode(mode){
+  authMode = mode;
+  document.getElementById("authTitle").textContent = mode === "login" ? "Log in" : "Sign up";
+  document.getElementById("authSubmit").textContent = mode === "login" ? "Log in" : "Create account";
+  document.querySelector(".auth-switch").innerHTML = mode === "login"
+    ? 'Don\'t have an account? <a id="authSwitchLink">Sign up</a>'
+    : 'Already have an account? <a id="authSwitchLink">Log in</a>';
+  document.getElementById("authSwitchLink").addEventListener("click", () => {
+    setAuthMode(mode === "login" ? "signup" : "login");
+  });
+  document.getElementById("authError").textContent = "";
+}
+document.getElementById("authSwitchLink").addEventListener("click", () => setAuthMode("signup"));
+
+document.getElementById("authSubmit").addEventListener("click", async () => {
+  const username = document.getElementById("authUsername").value.trim();
+  const password = document.getElementById("authPassword").value;
+  const errorEl = document.getElementById("authError");
+  errorEl.textContent = "";
+  if(!username || !password){
+    errorEl.textContent = "Please fill in both fields.";
+    return;
+  }
+  if(authMode === "signup"){
+    if(username.length < 3){
+      errorEl.textContent = "Username must be at least 3 characters.";
+      return;
+    }
+    if(!/^[a-zA-Z0-9_]+$/.test(username)){
+      errorEl.textContent = "Username can only contain letters, numbers, and underscores.";
+      return;
+    }
+    if(password.length < 6){
+      errorEl.textContent = "Password must be at least 6 characters.";
+      return;
+    }
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    if(!hasLetter || !hasNumber){
+      errorEl.textContent = "Password must include both letters and numbers.";
+      return;
+    }
+  }
+  const submitBtn = document.getElementById("authSubmit");
+  submitBtn.disabled = true;
+  const email = usernameToEmail(username);
+  try{
+    if(authMode === "signup"){
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await setDoc(doc(db, "users", cred.user.uid), {
+        habitLabels: ["Diet","Water","Workout 1","Workout 2","Book","Study"],
+        monthsData: {},
+        theme: "dark"
+      });
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
+    }
+  }catch(err){
+    errorEl.textContent = friendlyAuthError(err);
+  }
+  submitBtn.disabled = false;
+});
+
+document.getElementById("logoutBtn").addEventListener("click", () => signOut(auth));
+
+onAuthStateChanged(auth, async (user) => {
+  if(user){
+    currentUid = user.uid;
+    document.getElementById("authOverlay").style.display = "none";
+    document.getElementById("appSheet").style.display = "block";
+    document.getElementById("authUsername").value = "";
+    document.getElementById("authPassword").value = "";
+    await loadFromFirestore();
+  } else {
+    currentUid = null;
+    document.getElementById("authOverlay").style.display = "flex";
+    document.getElementById("appSheet").style.display = "none";
+  }
+});
+
 const REAL_TODAY = new Date();
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const SLEEP_LABELS = ["9 hrs","8 hrs","7 hrs","6 hrs","5 hrs"];
@@ -687,37 +888,36 @@ let saveTimer = null;
 function save(){
   const statusEl = document.getElementById("status");
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
+  saveTimer = setTimeout(async () => {
+    if(!currentUid) return;
     try{
-      localStorage.setItem(MONTHS_KEY, JSON.stringify(monthsData));
-      localStorage.setItem(META_KEY, JSON.stringify({ theme, habitLabels }));
+      statusEl.textContent = "Saving…";
+      await setDoc(doc(db, "users", currentUid), { habitLabels, monthsData, theme });
       statusEl.textContent = "Saved";
     }catch(err){
       statusEl.textContent = "Save failed";
     }
-  }, 300);
+  }, 400);
 }
 
-async function load(){
+async function loadFromFirestore(){
   const statusEl = document.getElementById("status");
+  statusEl.textContent = "Loading…";
   try{
-    const monthsRaw = localStorage.getItem(MONTHS_KEY);
-    if(monthsRaw) monthsData = JSON.parse(monthsRaw);
-  }catch(err){ /* no saved months yet */ }
-  try{
-    const metaRaw = localStorage.getItem(META_KEY);
-    if(metaRaw){
-      const meta = JSON.parse(metaRaw);
-      if(meta.theme) theme = meta.theme;
-      if(meta.habitLabels) habitLabels = meta.habitLabels;
+    const snap = await getDoc(doc(db, "users", currentUid));
+    if(snap.exists()){
+      const data = snap.data();
+      if(data.habitLabels) habitLabels = data.habitLabels;
+      if(data.monthsData) monthsData = data.monthsData;
+      if(data.theme) theme = data.theme;
     }
-  }catch(err){ /* no saved meta yet */ }
-  statusEl.textContent = "Ready";
+    statusEl.textContent = "Ready";
+  }catch(err){
+    statusEl.textContent = "Load failed";
+  }
   applyTheme();
   renderAll();
 }
-
-load();
 </script>
 </body>
 </html>
