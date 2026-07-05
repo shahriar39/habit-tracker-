@@ -885,8 +885,17 @@ document.getElementById("lightBtn").addEventListener("click", () => { theme = "l
 document.getElementById("darkBtn").addEventListener("click", () => { theme = "dark"; applyTheme(); save(); });
 
 let saveTimer = null;
+function cacheKey(){ return "habit-cache-" + currentUid; }
+
+function saveLocalCache(){
+  try{
+    localStorage.setItem(cacheKey(), JSON.stringify({ habitLabels, monthsData, theme }));
+  }catch(err){ /* localStorage unavailable, ignore */ }
+}
+
 function save(){
   const statusEl = document.getElementById("status");
+  saveLocalCache();
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     if(!currentUid) return;
@@ -895,7 +904,7 @@ function save(){
       await setDoc(doc(db, "users", currentUid), { habitLabels, monthsData, theme });
       statusEl.textContent = "Saved";
     }catch(err){
-      statusEl.textContent = "Save failed";
+      statusEl.textContent = "Saved on this device (will sync when possible)";
     }
   }, 400);
 }
@@ -903,6 +912,21 @@ function save(){
 async function loadFromFirestore(){
   const statusEl = document.getElementById("status");
   statusEl.textContent = "Loading…";
+
+  let hasLocalCache = false;
+  try{
+    const cached = localStorage.getItem(cacheKey());
+    if(cached){
+      const data = JSON.parse(cached);
+      if(data.habitLabels) habitLabels = data.habitLabels;
+      if(data.monthsData) monthsData = data.monthsData;
+      if(data.theme) theme = data.theme;
+      hasLocalCache = true;
+      applyTheme();
+      renderAll();
+    }
+  }catch(err){ /* no local cache, ignore */ }
+
   try{
     const snap = await getDoc(doc(db, "users", currentUid));
     if(snap.exists()){
@@ -910,10 +934,11 @@ async function loadFromFirestore(){
       if(data.habitLabels) habitLabels = data.habitLabels;
       if(data.monthsData) monthsData = data.monthsData;
       if(data.theme) theme = data.theme;
+      saveLocalCache();
     }
     statusEl.textContent = "Ready";
   }catch(err){
-    statusEl.textContent = "Load failed";
+    statusEl.textContent = hasLocalCache ? "Ready (offline copy — will sync when possible)" : "Load failed";
   }
   applyTheme();
   renderAll();
