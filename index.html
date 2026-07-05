@@ -416,7 +416,11 @@
 </head>
 <body>
 
-<div id="authOverlay" class="auth-overlay">
+<div id="sessionLoading" class="auth-overlay">
+  <div style="color:var(--ink);font-family:Arial, sans-serif;font-size:13px;">Loading…</div>
+</div>
+
+<div id="authOverlay" class="auth-overlay" style="display:none">
   <div class="auth-card">
     <h2 id="authTitle">Log in</h2>
     <div class="auth-error" id="authError"></div>
@@ -428,6 +432,20 @@
   </div>
 </div>
 
+<div id="profileOverlay" class="auth-overlay" style="display:none">
+  <div class="auth-card">
+    <h2>Profile</h2>
+    <p style="font-size:12px;color:var(--muted);margin:-6px 0 14px;">Logged in as <strong id="profileUsernameDisplay" style="color:var(--ink)"></strong></p>
+    <div class="auth-error" id="profileError"></div>
+    <div class="auth-success" id="profileSuccess" style="color:#2e7d32;font-size:12px;margin-bottom:10px;min-height:14px;"></div>
+    <input id="profileNewUsername" placeholder="New username (optional)">
+    <input id="profileNewPassword" type="password" placeholder="New password (optional)">
+    <input id="profileCurrentPassword" type="password" placeholder="Current password (required)" autocomplete="current-password">
+    <button class="auth-submit" id="profileSubmit">Save changes</button>
+    <p class="auth-switch"><a id="profileCloseLink">Close</a></p>
+  </div>
+</div>
+
 <div class="sheet" id="appSheet" style="display:none">
   <div class="topbar">
     <h1>habit<br>tracker</h1>
@@ -435,6 +453,7 @@
       <div class="mode-toggle">
         <button id="lightBtn">LIGHT</button>
         <button id="darkBtn">DARK</button>
+        <button id="profileBtn" class="logout-btn">PROFILE</button>
         <button id="logoutBtn" class="logout-btn">LOG OUT</button>
       </div>
       <div class="date-box">
@@ -484,7 +503,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  signOut, onAuthStateChanged
+  signOut, onAuthStateChanged, updateEmail, updatePassword,
+  reauthenticateWithCredential, EmailAuthProvider
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore, doc, getDoc, setDoc
@@ -502,6 +522,7 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 let currentUid = null;
+let currentUsername = "";
 
 function usernameToEmail(username){
   return username.trim().toLowerCase().replace(/\s+/g, "") + "@habittracker.local";
@@ -566,9 +587,11 @@ document.getElementById("authSubmit").addEventListener("click", async () => {
     if(authMode === "signup"){
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       await setDoc(doc(db, "users", cred.user.uid), {
+        username: username,
         habitLabels: ["Diet","Water","Workout 1","Workout 2","Book","Study"],
         monthsData: {},
-        theme: "dark"
+        theme: "dark",
+        updatedAt: Date.now()
       });
     } else {
       await signInWithEmailAndPassword(auth, email, password);
@@ -581,16 +604,95 @@ document.getElementById("authSubmit").addEventListener("click", async () => {
 
 document.getElementById("logoutBtn").addEventListener("click", () => signOut(auth));
 
+document.getElementById("profileBtn").addEventListener("click", () => {
+  document.getElementById("profileNewUsername").value = "";
+  document.getElementById("profileNewPassword").value = "";
+  document.getElementById("profileCurrentPassword").value = "";
+  document.getElementById("profileError").textContent = "";
+  document.getElementById("profileSuccess").textContent = "";
+  document.getElementById("profileUsernameDisplay").textContent = currentUsername;
+  document.getElementById("profileOverlay").style.display = "flex";
+});
+document.getElementById("profileCloseLink").addEventListener("click", () => {
+  document.getElementById("profileOverlay").style.display = "none";
+});
+
+document.getElementById("profileSubmit").addEventListener("click", async () => {
+  const newUsername = document.getElementById("profileNewUsername").value.trim();
+  const newPassword = document.getElementById("profileNewPassword").value;
+  const currentPassword = document.getElementById("profileCurrentPassword").value;
+  const errorEl = document.getElementById("profileError");
+  const successEl = document.getElementById("profileSuccess");
+  errorEl.textContent = "";
+  successEl.textContent = "";
+
+  if(!newUsername && !newPassword){
+    errorEl.textContent = "Enter a new username and/or new password to change.";
+    return;
+  }
+  if(!currentPassword){
+    errorEl.textContent = "Enter your current password to confirm changes.";
+    return;
+  }
+  if(newUsername){
+    if(newUsername.length < 3){
+      errorEl.textContent = "Username must be at least 3 characters.";
+      return;
+    }
+    if(!/^[a-zA-Z0-9_]+$/.test(newUsername)){
+      errorEl.textContent = "Username can only contain letters, numbers, and underscores.";
+      return;
+    }
+  }
+  if(newPassword){
+    if(newPassword.length < 6 || !/[a-zA-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)){
+      errorEl.textContent = "New password must be 6+ characters with letters and numbers.";
+      return;
+    }
+  }
+
+  const submitBtn = document.getElementById("profileSubmit");
+  submitBtn.disabled = true;
+  try{
+    const user = auth.currentUser;
+    const oldEmail = usernameToEmail(currentUsername);
+    const cred = EmailAuthProvider.credential(oldEmail, currentPassword);
+    await reauthenticateWithCredential(user, cred);
+
+    if(newUsername && newUsername !== currentUsername){
+      await updateEmail(user, usernameToEmail(newUsername));
+      currentUsername = newUsername;
+      await setDoc(doc(db, "users", currentUid), { username: currentUsername }, { merge: true });
+      saveLocalCache(Date.now());
+    }
+    if(newPassword){
+      await updatePassword(user, newPassword);
+    }
+    document.getElementById("profileUsernameDisplay").textContent = currentUsername;
+    successEl.textContent = "Changes saved.";
+    document.getElementById("profileNewUsername").value = "";
+    document.getElementById("profileNewPassword").value = "";
+    document.getElementById("profileCurrentPassword").value = "";
+  }catch(err){
+    errorEl.textContent = friendlyAuthError(err);
+  }
+  submitBtn.disabled = false;
+});
+
 onAuthStateChanged(auth, async (user) => {
+  document.getElementById("sessionLoading").style.display = "none";
   if(user){
     currentUid = user.uid;
+    currentUsername = (user.email || "").split("@")[0];
     document.getElementById("authOverlay").style.display = "none";
     document.getElementById("appSheet").style.display = "block";
     document.getElementById("authUsername").value = "";
     document.getElementById("authPassword").value = "";
+    document.getElementById("profileUsernameDisplay").textContent = currentUsername;
     await loadFromFirestore();
   } else {
     currentUid = null;
+    currentUsername = "";
     document.getElementById("authOverlay").style.display = "flex";
     document.getElementById("appSheet").style.display = "none";
   }
@@ -887,21 +989,26 @@ document.getElementById("darkBtn").addEventListener("click", () => { theme = "da
 let saveTimer = null;
 function cacheKey(){ return "habit-cache-" + currentUid; }
 
-function saveLocalCache(){
+function saveLocalCache(updatedAt){
   try{
-    localStorage.setItem(cacheKey(), JSON.stringify({ habitLabels, monthsData, theme }));
+    localStorage.setItem(cacheKey(), JSON.stringify({
+      username: currentUsername, habitLabels, monthsData, theme, updatedAt
+    }));
   }catch(err){ /* localStorage unavailable, ignore */ }
 }
 
 function save(){
   const statusEl = document.getElementById("status");
-  saveLocalCache();
+  const updatedAt = Date.now();
+  saveLocalCache(updatedAt);
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     if(!currentUid) return;
     try{
       statusEl.textContent = "Saving…";
-      await setDoc(doc(db, "users", currentUid), { habitLabels, monthsData, theme });
+      await setDoc(doc(db, "users", currentUid), {
+        username: currentUsername, habitLabels, monthsData, theme, updatedAt
+      });
       statusEl.textContent = "Saved";
     }catch(err){
       statusEl.textContent = "Saved on this device (will sync when possible)";
@@ -913,33 +1020,59 @@ async function loadFromFirestore(){
   const statusEl = document.getElementById("status");
   statusEl.textContent = "Loading…";
 
-  let hasLocalCache = false;
+  let localData = null;
   try{
     const cached = localStorage.getItem(cacheKey());
-    if(cached){
-      const data = JSON.parse(cached);
-      if(data.habitLabels) habitLabels = data.habitLabels;
-      if(data.monthsData) monthsData = data.monthsData;
-      if(data.theme) theme = data.theme;
-      hasLocalCache = true;
-      applyTheme();
-      renderAll();
-    }
+    if(cached) localData = JSON.parse(cached);
   }catch(err){ /* no local cache, ignore */ }
 
+  // Show local data immediately if present, so there's no blank flash
+  if(localData){
+    if(localData.habitLabels) habitLabels = localData.habitLabels;
+    if(localData.monthsData) monthsData = localData.monthsData;
+    if(localData.theme) theme = localData.theme;
+    applyTheme();
+    renderAll();
+  }
+
+  let cloudData = null;
+  let cloudReachable = false;
   try{
     const snap = await getDoc(doc(db, "users", currentUid));
     if(snap.exists()){
-      const data = snap.data();
-      if(data.habitLabels) habitLabels = data.habitLabels;
-      if(data.monthsData) monthsData = data.monthsData;
-      if(data.theme) theme = data.theme;
-      saveLocalCache();
+      cloudData = snap.data();
     }
+    cloudReachable = true;
+  }catch(err){ /* cloud unreachable, fall back to local */ }
+
+  const localTime = (localData && localData.updatedAt) || 0;
+  const cloudTime = (cloudData && cloudData.updatedAt) || 0;
+
+  if(cloudReachable && cloudData && cloudTime >= localTime){
+    // Cloud is newer or equal — trust it
+    if(cloudData.habitLabels) habitLabels = cloudData.habitLabels;
+    if(cloudData.monthsData) monthsData = cloudData.monthsData;
+    if(cloudData.theme) theme = cloudData.theme;
+    saveLocalCache(cloudTime);
     statusEl.textContent = "Ready";
-  }catch(err){
-    statusEl.textContent = hasLocalCache ? "Ready (offline copy — will sync when possible)" : "Load failed";
+  } else if(localData && localTime > cloudTime){
+    // Local is newer (a previous save never made it to the cloud) — keep it and repair the cloud
+    statusEl.textContent = cloudReachable
+      ? "Ready"
+      : "Ready (offline copy — will sync when possible)";
+    if(cloudReachable){
+      try{
+        await setDoc(doc(db, "users", currentUid), {
+          username: currentUsername, habitLabels, monthsData, theme, updatedAt: localTime
+        });
+      }catch(err){ /* will retry on next save */ }
+    }
+  } else if(!cloudReachable && !localData){
+    statusEl.textContent = "Load failed";
+  } else {
+    statusEl.textContent = "Ready";
   }
+
   applyTheme();
   renderAll();
 }
