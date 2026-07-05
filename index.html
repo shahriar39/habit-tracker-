@@ -36,8 +36,9 @@
     transition:background .25s ease, color .25s ease;
   }
   .sheet{
-    max-width:1100px;
+    max-width:1600px;
     margin:0 auto;
+    padding:0 24px;
   }
   .topbar{
     display:flex;
@@ -536,14 +537,14 @@
     <button class="btn" id="addHabit">+ Add habit</button>
   </div>
 
-  <div class="grid-wrap">
+  <div class="grid-wrap" id="sleepGridWrap" style="position:relative">
     <table id="sleepTable">
       <thead><tr id="sleepHead"><th class="label-col section-label">SLEEP</th></tr></thead>
       <tbody id="sleepBody"></tbody>
     </table>
+    <svg id="sleepOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible"></svg>
   </div>
   <div class="sleep-summary" id="sleepSummary">Average sleep this month: —</div>
-  <div id="sleepChart" style="margin-top:10px"></div>
 
   <div class="notes-box">
     <div class="notes-title">NOTES :</div>
@@ -997,7 +998,8 @@ function renderSleep(){
       const isFuture = todayDate !== -1 && (d+1) > todayDate;
       const td = document.createElement("td");
       td.className = "cell" + (d+1 === todayDate ? " today" : "") + (isFuture ? " future" : "");
-      td.textContent = md.sleepMarks[si][d] ? "✓" : "";
+      td.dataset.day = d;
+      td.dataset.si = si;
       if(!isFuture){
         td.addEventListener("click", () => {
           SLEEP_LABELS.forEach((_, oi) => { if(oi !== si) md.sleepMarks[oi][d] = false; });
@@ -1011,7 +1013,7 @@ function renderSleep(){
     body.appendChild(tr);
   });
   updateSleepSummary(md, n);
-  renderSleepChart(md, n);
+  requestAnimationFrame(() => drawSleepOverlay(md, n));
 }
 
 function updateSleepSummary(md, n){
@@ -1027,38 +1029,55 @@ function updateSleepSummary(md, n){
     : "Average sleep this month: —";
 }
 
-function renderSleepChart(md, n){
-  const container = document.getElementById("sleepChart");
+function drawSleepOverlay(md, n){
+  const wrap = document.getElementById("sleepGridWrap");
+  const svg = document.getElementById("sleepOverlay");
+  const wrapRect = wrap.getBoundingClientRect();
+  svg.setAttribute("width", wrapRect.width);
+  svg.setAttribute("height", wrapRect.height);
+  svg.setAttribute("viewBox", "0 0 " + wrapRect.width + " " + wrapRect.height);
+
   const points = [];
   for(let d=0; d<n; d++){
     for(let si=0; si<SLEEP_LABELS.length; si++){
-      if(md.sleepMarks[si][d]){ points.push({ day: d, value: SLEEP_VALUES[si] }); break; }
+      if(md.sleepMarks[si][d]){
+        const cell = wrap.querySelector('td[data-day="' + d + '"][data-si="' + si + '"]');
+        if(cell){
+          const r = cell.getBoundingClientRect();
+          points.push({
+            x: r.left - wrapRect.left + r.width / 2,
+            y: r.top - wrapRect.top + r.height / 2,
+            day: d,
+            value: SLEEP_VALUES[si]
+          });
+        }
+        break;
+      }
     }
   }
+
   if(points.length === 0){
-    container.innerHTML = '<p style="font-family:Arial, sans-serif;font-size:12px;color:var(--muted);margin:6px 0 0;">Log a few nights of sleep to see your trend here.</p>';
+    svg.innerHTML = "";
     return;
   }
-  const width = Math.max(340, n * 24);
-  const height = 110;
-  const padX = 16, padY = 14;
-  const minV = 5, maxV = 9;
-  const xFor = d => padX + (n <= 1 ? 0 : (d / (n - 1)) * (width - padX * 2));
-  const yFor = v => height - padY - ((v - minV) / (maxV - minV)) * (height - padY * 2);
 
-  const linePoints = points.map(p => xFor(p.day) + "," + yFor(p.value)).join(" ");
+  const linePoints = points.map(p => p.x + "," + p.y).join(" ");
   const dots = points.map(p =>
-    '<circle cx="' + xFor(p.day) + '" cy="' + yFor(p.value) + '" r="3.5" style="fill:var(--ink)">' +
+    '<circle cx="' + p.x + '" cy="' + p.y + '" r="4" style="fill:var(--ink)">' +
     '<title>Day ' + (p.day + 1) + ': ' + p.value + ' hrs</title>' +
     '</circle>'
   ).join("");
 
-  container.innerHTML =
-    '<svg viewBox="0 0 ' + width + ' ' + height + '" style="width:100%;height:100px;overflow:visible;display:block">' +
+  svg.innerHTML =
     '<polyline points="' + linePoints + '" style="fill:none;stroke:var(--ink);stroke-width:2" stroke-linejoin="round" stroke-linecap="round"/>' +
-    dots +
-    '</svg>';
+    dots;
 }
+
+window.addEventListener("resize", () => {
+  const md = getMonthData(viewDate);
+  drawSleepOverlay(md, daysIn(viewDate));
+});
+
 
 function renderNotes(){
   const md = getMonthData(viewDate);
