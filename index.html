@@ -510,9 +510,15 @@
     </div>
   </div>
 
-  <div style="display:flex;justify-content:flex-end;margin-bottom:18px">
-    <div class="overview-card" id="habitsOverviewCard">
-      <div class="overview-title">Habits Overview</div>
+  <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:8px">
+    <div class="grid-wrap" style="flex:1;margin-bottom:0">
+      <table id="habitsTable">
+        <thead><tr id="habitsHead"><th class="label-col section-label">HABITS / DAYS</th></tr></thead>
+        <tbody id="habitsBody"></tbody>
+      </table>
+    </div>
+    <div class="overview-card" id="habitsOverviewCard" style="flex-shrink:0">
+      <div class="overview-title">Today's Habits Overview</div>
       <div class="overview-body">
         <svg id="overviewRing" viewBox="0 0 120 120" width="90" height="90">
           <circle cx="60" cy="60" r="50" style="fill:none;stroke:var(--line);stroke-width:12"></circle>
@@ -525,13 +531,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="grid-wrap">
-    <table id="habitsTable">
-      <thead><tr id="habitsHead"><th class="label-col section-label">HABITS / DAYS</th></tr></thead>
-      <tbody id="habitsBody"></tbody>
-    </table>
   </div>
   <div class="row-actions">
     <button class="btn" id="addHabit">+ Add habit</button>
