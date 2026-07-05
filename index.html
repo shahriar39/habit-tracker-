@@ -1011,7 +1011,9 @@ function save(){
     try{
       statusEl.textContent = "Saving…";
       await setDoc(doc(db, "users", currentUid), {
-        username: currentUsername, habitLabels, monthsData, theme, updatedAt
+        username: currentUsername,
+        dataJSON: JSON.stringify({ habitLabels, monthsData, theme }),
+        updatedAt
       });
       statusEl.textContent = "Saved";
     }catch(err){
@@ -1039,24 +1041,29 @@ async function loadFromFirestore(){
     renderAll();
   }
 
-  let cloudData = null;
+  let cloudPayload = null;
+  let cloudUpdatedAt = 0;
   let cloudReachable = false;
   try{
     const snap = await getDoc(doc(db, "users", currentUid));
     if(snap.exists()){
-      cloudData = snap.data();
+      const raw = snap.data();
+      cloudUpdatedAt = raw.updatedAt || 0;
+      if(raw.dataJSON){
+        cloudPayload = JSON.parse(raw.dataJSON);
+      }
     }
     cloudReachable = true;
   }catch(err){ /* cloud unreachable, fall back to local */ }
 
   const localTime = (localData && localData.updatedAt) || 0;
-  const cloudTime = (cloudData && cloudData.updatedAt) || 0;
+  const cloudTime = cloudUpdatedAt;
 
-  if(cloudReachable && cloudData && cloudTime >= localTime){
+  if(cloudReachable && cloudPayload && cloudTime >= localTime){
     // Cloud is newer or equal — trust it
-    if(cloudData.habitLabels) habitLabels = cloudData.habitLabels;
-    if(cloudData.monthsData) monthsData = cloudData.monthsData;
-    if(cloudData.theme) theme = cloudData.theme;
+    if(cloudPayload.habitLabels) habitLabels = cloudPayload.habitLabels;
+    if(cloudPayload.monthsData) monthsData = cloudPayload.monthsData;
+    if(cloudPayload.theme) theme = cloudPayload.theme;
     saveLocalCache(cloudTime);
     statusEl.textContent = "Ready";
   } else if(localData && localTime > cloudTime){
@@ -1067,7 +1074,9 @@ async function loadFromFirestore(){
     if(cloudReachable){
       try{
         await setDoc(doc(db, "users", currentUid), {
-          username: currentUsername, habitLabels, monthsData, theme, updatedAt: localTime
+          username: currentUsername,
+          dataJSON: JSON.stringify({ habitLabels, monthsData, theme }),
+          updatedAt: localTime
         });
       }catch(err){ /* will retry on next save */ }
     }
