@@ -264,9 +264,12 @@
   .status{
     text-align:center;
     font-family:Arial, sans-serif;
-    font-size:10px;
+    font-size:11px;
     color:var(--muted);
     margin-top:16px;
+    padding:0 20px;
+    word-break:break-word;
+    user-select:text;
   }
   tbody tr.habit-row{
     cursor:grab;
@@ -1012,7 +1015,7 @@ function save(){
       });
       statusEl.textContent = "Saved";
     }catch(err){
-      statusEl.textContent = "Saved on this device (will sync when possible)";
+      statusEl.textContent = "Saved on this device only — sync error: " + (err.code || err.message || "unknown error");
     }
   }, 400);
 }
