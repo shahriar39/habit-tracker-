@@ -213,6 +213,45 @@
     color:var(--ink);
     margin-top:8px;
   }
+  .overview-card{
+    border:1.2px solid var(--line-strong);
+    border-radius:10px;
+    padding:14px 18px;
+    background:var(--surface);
+    font-family:Arial, sans-serif;
+    min-width:230px;
+  }
+  .overview-title{
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    letter-spacing:.03em;
+    margin-bottom:10px;
+  }
+  .overview-body{
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .overview-stats{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .overview-stats div{
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+  }
+  .overview-stats span{
+    font-size:18px;
+    font-weight:700;
+    color:var(--ink-strong);
+  }
+  .overview-stats label{
+    font-size:11px;
+    color:var(--muted);
+  }
   .notes-box{
     border:1px solid var(--line-strong);
     padding:10px 14px 4px;
@@ -471,6 +510,23 @@
     </div>
   </div>
 
+  <div style="display:flex;justify-content:flex-end;margin-bottom:18px">
+    <div class="overview-card" id="habitsOverviewCard">
+      <div class="overview-title">Habits Overview</div>
+      <div class="overview-body">
+        <svg id="overviewRing" viewBox="0 0 120 120" width="90" height="90">
+          <circle cx="60" cy="60" r="50" style="fill:none;stroke:var(--line);stroke-width:12"></circle>
+          <circle id="overviewArc" cx="60" cy="60" r="50" style="fill:none;stroke:var(--ink);stroke-width:12" stroke-linecap="round" transform="rotate(-90 60 60)"></circle>
+          <text id="overviewPercentText" x="60" y="66" text-anchor="middle" style="font-family:Arial, sans-serif;font-size:22px;font-weight:700;fill:var(--ink-strong)">0%</text>
+        </svg>
+        <div class="overview-stats">
+          <div><span id="overviewTotal">0</span><label>Total</label></div>
+          <div><span id="overviewCompleted">0</span><label>Completed</label></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="grid-wrap">
     <table id="habitsTable">
       <thead><tr id="habitsHead"><th class="label-col section-label">HABITS / DAYS</th></tr></thead>
@@ -488,6 +544,7 @@
     </table>
   </div>
   <div class="sleep-summary" id="sleepSummary">Average sleep this month: —</div>
+  <div id="sleepChart" style="margin-top:10px"></div>
 
   <div class="notes-box">
     <div class="notes-title">NOTES :</div>
@@ -799,12 +856,35 @@ function renderHabits(){
           md.habitMarks[hi][d] = !md.habitMarks[hi][d];
           td.textContent = md.habitMarks[hi][d] ? "✓" : "";
           save();
+          renderHabitsOverview();
         });
       }
       tr.appendChild(td);
     }
     body.appendChild(tr);
   });
+  renderHabitsOverview();
+}
+
+function renderHabitsOverview(){
+  const todayMd = getMonthData(REAL_TODAY);
+  const todayIndex = REAL_TODAY.getDate() - 1;
+  const total = habitLabels.length;
+  let completed = 0;
+  for(let hi = 0; hi < total; hi++){
+    if(todayMd.habitMarks[hi] && todayMd.habitMarks[hi][todayIndex]) completed++;
+  }
+  const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  document.getElementById("overviewTotal").textContent = total;
+  document.getElementById("overviewCompleted").textContent = completed;
+  document.getElementById("overviewPercentText").textContent = percent + "%";
+
+  const arc = document.getElementById("overviewArc");
+  const circumference = 2 * Math.PI * 50;
+  const offset = circumference * (1 - percent / 100);
+  arc.style.strokeDasharray = circumference;
+  arc.style.strokeDashoffset = offset;
 }
 
 function reorderHabit(fromIndex, toIndex){
@@ -932,6 +1012,7 @@ function renderSleep(){
     body.appendChild(tr);
   });
   updateSleepSummary(md, n);
+  renderSleepChart(md, n);
 }
 
 function updateSleepSummary(md, n){
@@ -945,6 +1026,39 @@ function updateSleepSummary(md, n){
   el.textContent = count > 0
     ? "Average sleep this month: " + (total/count).toFixed(1) + " hrs (" + count + " day" + (count>1?"s":"") + " logged)"
     : "Average sleep this month: —";
+}
+
+function renderSleepChart(md, n){
+  const container = document.getElementById("sleepChart");
+  const points = [];
+  for(let d=0; d<n; d++){
+    for(let si=0; si<SLEEP_LABELS.length; si++){
+      if(md.sleepMarks[si][d]){ points.push({ day: d, value: SLEEP_VALUES[si] }); break; }
+    }
+  }
+  if(points.length === 0){
+    container.innerHTML = '<p style="font-family:Arial, sans-serif;font-size:12px;color:var(--muted);margin:6px 0 0;">Log a few nights of sleep to see your trend here.</p>';
+    return;
+  }
+  const width = Math.max(340, n * 24);
+  const height = 110;
+  const padX = 16, padY = 14;
+  const minV = 5, maxV = 9;
+  const xFor = d => padX + (n <= 1 ? 0 : (d / (n - 1)) * (width - padX * 2));
+  const yFor = v => height - padY - ((v - minV) / (maxV - minV)) * (height - padY * 2);
+
+  const linePoints = points.map(p => xFor(p.day) + "," + yFor(p.value)).join(" ");
+  const dots = points.map(p =>
+    '<circle cx="' + xFor(p.day) + '" cy="' + yFor(p.value) + '" r="3.5" style="fill:var(--ink)">' +
+    '<title>Day ' + (p.day + 1) + ': ' + p.value + ' hrs</title>' +
+    '</circle>'
+  ).join("");
+
+  container.innerHTML =
+    '<svg viewBox="0 0 ' + width + ' ' + height + '" style="width:100%;height:100px;overflow:visible;display:block">' +
+    '<polyline points="' + linePoints + '" style="fill:none;stroke:var(--ink);stroke-width:2" stroke-linejoin="round" stroke-linecap="round"/>' +
+    dots +
+    '</svg>';
 }
 
 function renderNotes(){
