@@ -253,6 +253,135 @@
     font-size:11px;
     color:var(--muted);
   }
+  .topbar-center{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    font-family:Arial, sans-serif;
+    padding-top:8px;
+  }
+  .greeting{
+    font-size:16px;
+    font-weight:700;
+    color:var(--ink);
+    font-family:'Georgia', serif;
+  }
+  .page-nav{
+    display:flex;
+    gap:6px;
+  }
+  .page-nav-btn{
+    border:1.2px solid var(--line-strong);
+    background:transparent;
+    color:var(--ink);
+    padding:6px 14px;
+    font-size:11px;
+    font-weight:700;
+    border-radius:20px;
+    cursor:pointer;
+    font-family:Arial, sans-serif;
+    letter-spacing:.03em;
+  }
+  .page-nav-btn.active{
+    background:var(--ink);
+    color:var(--bg);
+  }
+  .report-banner{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    justify-content:center;
+    background:var(--surface);
+    border:1.2px solid var(--line-strong);
+    border-radius:8px;
+    padding:12px 16px;
+    margin-bottom:20px;
+    font-family:Arial, sans-serif;
+    font-size:13px;
+    color:var(--ink-strong);
+    flex-wrap:wrap;
+  }
+  .insight-card{
+    border:1.2px solid var(--line-strong);
+    border-radius:10px;
+    padding:18px 20px;
+    background:var(--surface);
+    font-family:Arial, sans-serif;
+    margin-bottom:18px;
+  }
+  .insight-title{
+    font-size:15px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:8px;
+    font-family:'Georgia', serif;
+  }
+  .insight-sub{
+    font-size:12px;
+    color:var(--muted);
+    margin:0 0 10px;
+    line-height:1.5;
+  }
+  .badge-shelf{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .badge{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    width:84px;
+    text-align:center;
+  }
+  .badge-icon{
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    border:2px solid var(--line-strong);
+  }
+  .badge.locked .badge-icon{
+    opacity:0.25;
+    filter:grayscale(1);
+  }
+  .badge.unlocked .badge-icon{
+    background:var(--ink);
+    color:var(--bg);
+    border-color:var(--ink);
+  }
+  .badge-label{
+    font-size:10px;
+    color:var(--muted);
+    line-height:1.3;
+  }
+  .report-card{
+    border:1.2px solid var(--line-strong);
+    border-radius:10px;
+    padding:20px;
+    background:var(--bg);
+    margin-top:6px;
+  }
+  .report-card h3{
+    font-family:'Georgia', serif;
+    color:var(--ink);
+    margin:0 0 12px;
+    font-size:20px;
+  }
+  .report-row{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 0;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+  }
+  .report-row:last-child{ border-bottom:none; }
+  .report-row span:last-child{ font-weight:700; color:var(--ink-strong); }
   .notes-box{
     border:1px solid var(--line-strong);
     padding:10px 14px 4px;
@@ -493,6 +622,13 @@
 <div class="sheet" id="appSheet" style="display:none">
   <div class="topbar">
     <h1>habit<br>tracker</h1>
+    <div class="topbar-center">
+      <div class="greeting" id="greetingText"></div>
+      <div class="page-nav">
+        <button id="navTracker" class="page-nav-btn active">TRACKER</button>
+        <button id="navInsights" class="page-nav-btn">INSIGHTS</button>
+      </div>
+    </div>
     <div class="right-controls">
       <div class="mode-toggle">
         <button id="lightBtn">LIGHT</button>
@@ -510,6 +646,14 @@
       </div>
     </div>
   </div>
+
+  <div id="reportBanner" class="report-banner" style="display:none">
+    <span id="reportBannerText"></span>
+    <button class="btn" id="reportBannerBtn">Generate report</button>
+    <button class="btn" id="reportBannerDismiss">Dismiss</button>
+  </div>
+
+  <div id="viewTracker">
 
   <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:8px">
     <div class="grid-wrap" style="flex:1;margin-bottom:0">
@@ -552,13 +696,45 @@
     <input data-note="1" placeholder="">
   </div>
 
-  <div class="footer">
-    <a id="igLink" href="https://www.instagram.com/niloy.39/" target="_blank" rel="noopener">Instagram</a>
-    <a id="xLink" href="https://x.com/niloy_39" target="_blank" rel="noopener">X</a>
+  </div>
+
+  <div id="viewInsights" style="display:none">
+
+    <div class="insight-card">
+      <div class="insight-title">Monthly Report</div>
+      <p class="insight-sub">Generate a shareable summary for any month you've tracked.</p>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+        <button class="btn" id="generateReportBtn">Generate report for current month</button>
+      </div>
+      <div id="reportOutput"></div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-title">Month-over-Month</div>
+      <div id="monthCompareText" class="insight-sub">Not enough history yet — keep tracking for a month or two.</div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-title">Badge Shelf</div>
+      <div id="badgeShelf" class="badge-shelf"></div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-title">Smart Reminders</div>
+      <p class="insight-sub" id="reminderStatusText">Learns the time you usually check in, and reminds you around then — no need to set a fixed time.</p>
+      <button class="btn" id="enableReminderBtn">Enable smart reminders</button>
+    </div>
+
+    <div class="footer" style="justify-content:center;margin-top:30px">
+      <a id="igLink" href="https://www.instagram.com/niloy.39/" target="_blank" rel="noopener">Instagram</a>
+      <a id="xLink" href="https://x.com/niloy_39" target="_blank" rel="noopener">X</a>
+    </div>
+
   </div>
 
   <div class="status" id="status">Loading…</div>
 </div>
+
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -651,7 +827,7 @@ document.getElementById("authSubmit").addEventListener("click", async () => {
         username: username,
         habitLabels: ["Diet","Water","Workout 1","Workout 2","Book","Study"],
         monthsData: {},
-        theme: "dark",
+        theme: "light",
         updatedAt: Date.now()
       });
     } else {
@@ -750,6 +926,17 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById("authUsername").value = "";
     document.getElementById("authPassword").value = "";
     document.getElementById("profileUsernameDisplay").textContent = currentUsername;
+    try{
+      const raw = localStorage.getItem("checkin-times-" + currentUid);
+      if(raw) checkinTimes = JSON.parse(raw);
+    }catch(e){ /* ignore */ }
+    try{
+      if(localStorage.getItem("reminders-enabled-" + currentUid) === "1"){
+        remindersEnabled = true;
+        startReminderWatcher();
+      }
+    }catch(e){ /* ignore */ }
+    updateReminderStatusText();
     await loadFromFirestore();
   } else {
     currentUid = null;
@@ -765,7 +952,7 @@ const SLEEP_LABELS = ["9 hrs","8 hrs","7 hrs","6 hrs","5 hrs"];
 const SLEEP_VALUES = [9,8,7,6,5];
 
 let habitLabels = ["Diet","Water","Workout 1","Workout 2","Book","Study"];
-let theme = "dark";
+let theme = "light";
 let monthsData = {}; // keyed by "YYYY-M" -> { habitMarks:[[...]], sleepMarks:[[...]], notes:["",""] }
 let viewDate = new Date(REAL_TODAY.getFullYear(), REAL_TODAY.getMonth(), 1);
 
@@ -855,6 +1042,7 @@ function renderHabits(){
         td.addEventListener("click", () => {
           md.habitMarks[hi][d] = !md.habitMarks[hi][d];
           td.textContent = md.habitMarks[hi][d] ? "✓" : "";
+          if(md.habitMarks[hi][d]) recordCheckinIfToday(d);
           save();
           renderHabitsOverview();
         });
@@ -1091,7 +1279,276 @@ function renderAll(){
   renderHabits();
   renderSleep();
   renderNotes();
+  renderGreeting();
+  checkReportBanner();
 }
+
+function renderGreeting(){
+  const hour = new Date().getHours();
+  let part = "night";
+  if(hour >= 5 && hour < 12) part = "morning";
+  else if(hour >= 12 && hour < 17) part = "afternoon";
+  else if(hour >= 17 && hour < 21) part = "evening";
+  const name = currentUsername ? (", " + currentUsername) : "";
+  const el = document.getElementById("greetingText");
+  if(el) el.textContent = "Good " + part + name;
+}
+
+function switchView(view){
+  document.getElementById("viewTracker").style.display = view === "tracker" ? "block" : "none";
+  document.getElementById("viewInsights").style.display = view === "insights" ? "block" : "none";
+  document.getElementById("navTracker").classList.toggle("active", view === "tracker");
+  document.getElementById("navInsights").classList.toggle("active", view === "insights");
+  if(view === "insights"){
+    renderMonthComparison();
+    renderBadgeShelf();
+  }
+}
+document.getElementById("navTracker").addEventListener("click", () => switchView("tracker"));
+document.getElementById("navInsights").addEventListener("click", () => switchView("insights"));
+
+// ---------- Streaks & badges ----------
+function getEarliestMonthKey(){
+  const keys = Object.keys(monthsData);
+  if(keys.length === 0) return null;
+  keys.sort((a, b) => {
+    const [ay, am] = a.split("-").map(Number);
+    const [by, bm] = b.split("-").map(Number);
+    return (ay * 12 + am) - (by * 12 + bm);
+  });
+  return keys[0];
+}
+function isHabitDoneOnDate(hi, dateObj){
+  const key = monthKey(dateObj);
+  const md = monthsData[key];
+  if(!md || !md.habitMarks || !md.habitMarks[hi]) return false;
+  return !!md.habitMarks[hi][dateObj.getDate() - 1];
+}
+function computeStreaks(hi){
+  const earliestKey = getEarliestMonthKey();
+  if(!earliestKey) return { current: 0, longest: 0 };
+  const [ey, em] = earliestKey.split("-").map(Number);
+  let cursor = new Date(ey, em - 1, 1);
+  const end = new Date(REAL_TODAY.getFullYear(), REAL_TODAY.getMonth(), REAL_TODAY.getDate());
+  let longest = 0, running = 0;
+  while(cursor <= end){
+    if(isHabitDoneOnDate(hi, cursor)){ running++; if(running > longest) longest = running; }
+    else { running = 0; }
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  let current = 0;
+  let d = new Date(end);
+  while(isHabitDoneOnDate(hi, d)){ current++; d.setDate(d.getDate() - 1); }
+  return { current, longest };
+}
+function renderBadgeShelf(){
+  const container = document.getElementById("badgeShelf");
+  const thresholds = [
+    { days: 7, icon: "🔥", label: "7-day streak" },
+    { days: 30, icon: "⭐", label: "30-day streak" },
+    { days: 100, icon: "🏆", label: "100-day streak" },
+    { days: 365, icon: "👑", label: "365-day streak" }
+  ];
+  let bestLongest = 0;
+  habitLabels.forEach((label, hi) => {
+    const { longest } = computeStreaks(hi);
+    if(longest > bestLongest) bestLongest = longest;
+  });
+  container.innerHTML = thresholds.map(t => {
+    const unlocked = bestLongest >= t.days;
+    return '<div class="badge ' + (unlocked ? "unlocked" : "locked") + '"><div class="badge-icon">' + t.icon + '</div><div class="badge-label">' + t.label + (unlocked ? "" : " (locked)") + '</div></div>';
+  }).join("");
+}
+
+// ---------- Month-over-month ----------
+function getMonthStats(y, m){
+  const key = y + "-" + (m + 1);
+  const md = monthsData[key];
+  const days = new Date(y, m + 1, 0).getDate();
+  const totalPossible = habitLabels.length * days;
+  let completed = 0, sleepTotal = 0, sleepCount = 0;
+  if(md){
+    for(let hi = 0; hi < habitLabels.length; hi++){
+      if(md.habitMarks && md.habitMarks[hi]){
+        for(let d = 0; d < days; d++) if(md.habitMarks[hi][d]) completed++;
+      }
+    }
+    if(md.sleepMarks){
+      for(let d = 0; d < days; d++){
+        for(let si = 0; si < SLEEP_LABELS.length; si++){
+          if(md.sleepMarks[si] && md.sleepMarks[si][d]){ sleepTotal += SLEEP_VALUES[si]; sleepCount++; break; }
+        }
+      }
+    }
+  }
+  return {
+    completionPct: totalPossible > 0 ? (completed / totalPossible * 100) : 0,
+    avgSleep: sleepCount > 0 ? (sleepTotal / sleepCount) : null,
+    hasData: !!md
+  };
+}
+function renderMonthComparison(){
+  const el = document.getElementById("monthCompareText");
+  const cy = viewDate.getFullYear(), cm = viewDate.getMonth();
+  let py = cy, pm = cm - 1;
+  if(pm < 0){ pm = 11; py = cy - 1; }
+  const current = getMonthStats(cy, cm);
+  const prev = getMonthStats(py, pm);
+  if(!prev.hasData || !current.hasData){
+    el.textContent = "Not enough history yet — keep tracking for a month or two.";
+    return;
+  }
+  const lines = [];
+  const diffPct = current.completionPct - prev.completionPct;
+  lines.push(Math.abs(diffPct) >= 0.5
+    ? "You're " + (diffPct >= 0 ? "up " : "down ") + Math.abs(diffPct).toFixed(0) + "% in habit completion compared to last month."
+    : "Your habit completion is about the same as last month.");
+  if(current.avgSleep !== null && prev.avgSleep !== null){
+    const diffMins = Math.round(Math.abs(current.avgSleep - prev.avgSleep) * 60);
+    lines.push(diffMins >= 5
+      ? "Sleep averaged " + diffMins + " minutes " + (current.avgSleep >= prev.avgSleep ? "more" : "less") + " than last month."
+      : "Sleep averaged about the same as last month.");
+  }
+  el.innerHTML = lines.map(l => "<p style='margin:4px 0'>" + l + "</p>").join("");
+}
+
+// ---------- Monthly report ----------
+function generateReport(y, m){
+  const stats = getMonthStats(y, m);
+  const key = y + "-" + (m + 1);
+  const md = monthsData[key];
+  const days = new Date(y, m + 1, 0).getDate();
+  let best = null, bestPct = -1;
+  habitLabels.forEach((label, hi) => {
+    let count = 0;
+    if(md && md.habitMarks && md.habitMarks[hi]){
+      for(let d = 0; d < days; d++) if(md.habitMarks[hi][d]) count++;
+    }
+    const pct = days > 0 ? (count / days * 100) : 0;
+    if(pct > bestPct){ bestPct = pct; best = label; }
+  });
+  let longestStreakOverall = 0;
+  habitLabels.forEach((label, hi) => {
+    const { longest } = computeStreaks(hi);
+    if(longest > longestStreakOverall) longestStreakOverall = longest;
+  });
+  return {
+    monthName: MONTH_NAMES[m] + " " + y,
+    completionPct: stats.completionPct,
+    avgSleep: stats.avgSleep,
+    bestHabit: best,
+    bestHabitPct: bestPct,
+    longestStreak: longestStreakOverall
+  };
+}
+function renderReportCard(report){
+  const el = document.getElementById("reportOutput");
+  el.innerHTML =
+    '<div class="report-card"><h3>' + report.monthName + ' Report</h3>' +
+    '<div class="report-row"><span>Overall completion</span><span>' + report.completionPct.toFixed(0) + '%</span></div>' +
+    '<div class="report-row"><span>Best habit</span><span>' + (report.bestHabit || '—') + (report.bestHabit ? ' (' + report.bestHabitPct.toFixed(0) + '%)' : '') + '</span></div>' +
+    '<div class="report-row"><span>Average sleep</span><span>' + (report.avgSleep !== null ? report.avgSleep.toFixed(1) + ' hrs' : '—') + '</span></div>' +
+    '<div class="report-row"><span>Longest streak</span><span>' + report.longestStreak + ' days</span></div>' +
+    '</div>';
+}
+document.getElementById("generateReportBtn").addEventListener("click", () => {
+  renderReportCard(generateReport(viewDate.getFullYear(), viewDate.getMonth()));
+});
+
+function checkReportBanner(){
+  const banner = document.getElementById("reportBanner");
+  if(REAL_TODAY.getDate() !== 1){ banner.style.display = "none"; return; }
+  let py = REAL_TODAY.getFullYear(), pm = REAL_TODAY.getMonth() - 1;
+  if(pm < 0){ pm = 11; py--; }
+  const dismissKey = "report-banner-dismissed-" + py + "-" + pm;
+  if(sessionStorage.getItem(dismissKey)){ banner.style.display = "none"; return; }
+  document.getElementById("reportBannerText").textContent = "It's a new month — want to generate your " + MONTH_NAMES[pm] + " report?";
+  banner.style.display = "flex";
+  banner.dataset.py = py; banner.dataset.pm = pm; banner.dataset.dismissKey = dismissKey;
+}
+document.getElementById("reportBannerBtn").addEventListener("click", () => {
+  const banner = document.getElementById("reportBanner");
+  const py = +banner.dataset.py, pm = +banner.dataset.pm;
+  switchView("insights");
+  renderReportCard(generateReport(py, pm));
+  banner.style.display = "none";
+  sessionStorage.setItem(banner.dataset.dismissKey, "1");
+});
+document.getElementById("reportBannerDismiss").addEventListener("click", () => {
+  const banner = document.getElementById("reportBanner");
+  sessionStorage.setItem(banner.dataset.dismissKey, "1");
+  banner.style.display = "none";
+});
+
+// ---------- Smart reminders ----------
+let checkinTimes = [];
+let remindersEnabled = false;
+let reminderInterval = null;
+let lastReminderDateStr = null;
+
+function recordCheckinIfToday(dayIndex){
+  if(dayIndex !== REAL_TODAY.getDate() - 1) return;
+  const now = new Date();
+  const minutes = now.getHours() * 60 + now.getMinutes();
+  checkinTimes.push(minutes);
+  if(checkinTimes.length > 40) checkinTimes.shift();
+  try{ localStorage.setItem("checkin-times-" + currentUid, JSON.stringify(checkinTimes)); }catch(e){}
+}
+function computeAverageCheckinTime(){
+  if(checkinTimes.length === 0) return null;
+  return Math.round(checkinTimes.reduce((a, b) => a + b, 0) / checkinTimes.length);
+}
+function updateReminderStatusText(){
+  const el = document.getElementById("reminderStatusText");
+  if(!remindersEnabled){
+    el.textContent = "Learns the time you usually check in, and reminds you around then — no need to set a fixed time.";
+    return;
+  }
+  const avg = computeAverageCheckinTime();
+  if(avg === null){
+    el.textContent = "Reminders are on. Check in a few times so it can learn your usual time.";
+  } else {
+    const h = Math.floor(avg / 60), mm = avg % 60;
+    const displayH = (h % 12) || 12;
+    const ampm = h >= 12 ? "PM" : "AM";
+    el.textContent = "Reminders are on — we'll nudge you around " + displayH + ":" + String(mm).padStart(2, "0") + " " + ampm + " if you haven't checked in yet. (Only works while this tab stays open.)";
+  }
+}
+function startReminderWatcher(){
+  if(reminderInterval) return;
+  reminderInterval = setInterval(() => {
+    if(!remindersEnabled) return;
+    const avg = computeAverageCheckinTime();
+    if(avg === null) return;
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const todayStr = now.toDateString();
+    if(Math.abs(nowMinutes - avg) <= 1 && lastReminderDateStr !== todayStr){
+      const todayMd = getMonthData(REAL_TODAY);
+      const todayIndex = REAL_TODAY.getDate() - 1;
+      const allDone = habitLabels.every((_, hi) => todayMd.habitMarks[hi] && todayMd.habitMarks[hi][todayIndex]);
+      if(!allDone){
+        new Notification("Habit Tracker", { body: "It's about your usual time — don't forget to check in today!" });
+      }
+      lastReminderDateStr = todayStr;
+    }
+  }, 30000);
+}
+document.getElementById("enableReminderBtn").addEventListener("click", async () => {
+  if(!("Notification" in window)){
+    document.getElementById("reminderStatusText").textContent = "Notifications aren't supported in this browser.";
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  if(perm !== "granted"){
+    document.getElementById("reminderStatusText").textContent = "Notification permission wasn't granted.";
+    return;
+  }
+  remindersEnabled = true;
+  try{ localStorage.setItem("reminders-enabled-" + currentUid, "1"); }catch(e){}
+  updateReminderStatusText();
+  startReminderWatcher();
+});
 
 document.getElementById("addHabit").addEventListener("click", () => {
   habitLabels.push("New habit");
