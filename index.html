@@ -72,16 +72,17 @@
     color:var(--ink);
   }
   .mode-toggle button{
-    border:1.5px solid var(--line-strong);
+    border:1px solid var(--line-strong);
     background:transparent;
     color:var(--ink);
-    padding:6px 12px;
+    padding:7px 14px;
     font-size:11px;
     font-weight:700;
     font-family:Arial, sans-serif;
     cursor:pointer;
     border-radius:20px;
     letter-spacing:.02em;
+    transition:background .15s ease, color .15s ease;
   }
   .mode-toggle button.active{
     background:var(--ink);
@@ -99,12 +100,14 @@
     margin-bottom:4px;
   }
   .date-box .date-display{
-    border:1.5px solid var(--line-strong);
-    padding:8px 14px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:9px 16px;
     font-family:Arial, sans-serif;
     font-size:13px;
     color:var(--ink-strong);
     min-width:170px;
+    box-shadow:0 1px 4px rgba(0,0,0,0.06);
   }
   .month-nav{
     border:none;
@@ -147,6 +150,7 @@
     text-align:left;
     padding-left:10px;
     letter-spacing:.04em;
+    border-radius:8px 0 0 0;
   }
   tbody td.label-cell{
     font-family:Arial, sans-serif;
@@ -197,17 +201,19 @@
     font-family:Arial, sans-serif;
   }
   .btn{
-    border:1.2px solid var(--line-strong);
+    border:1px solid var(--line-strong);
     background:transparent;
     color:var(--ink);
-    padding:6px 12px;
+    padding:7px 14px;
     font-size:11px;
     font-weight:700;
     cursor:pointer;
     font-family:Arial, sans-serif;
-    border-radius:4px;
+    border-radius:8px;
+    transition:background .15s ease, transform .1s ease;
   }
   .btn:hover{ background:var(--line); }
+  .btn:active{ transform:scale(0.97); }
   .sleep-summary{
     font-family:Arial, sans-serif;
     font-size:12px;
@@ -215,12 +221,13 @@
     margin-top:8px;
   }
   .overview-card{
-    border:1.2px solid var(--line-strong);
-    border-radius:10px;
-    padding:14px 18px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 20px;
     background:var(--surface);
     font-family:Arial, sans-serif;
     min-width:230px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.08);
   }
   .overview-title{
     font-size:12px;
@@ -303,12 +310,17 @@
     flex-wrap:wrap;
   }
   .insight-card{
-    border:1.2px solid var(--line-strong);
-    border-radius:10px;
-    padding:18px 20px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 24px;
     background:var(--surface);
     font-family:Arial, sans-serif;
     margin-bottom:18px;
+    box-shadow:0 2px 12px rgba(0,0,0,0.08);
+    transition:box-shadow .2s ease;
+  }
+  .insight-card:hover{
+    box-shadow:0 4px 18px rgba(0,0,0,0.11);
   }
   .insight-title{
     font-size:15px;
@@ -383,9 +395,11 @@
   .report-row:last-child{ border-bottom:none; }
   .report-row span:last-child{ font-weight:700; color:var(--ink-strong); }
   .notes-box{
-    border:1px solid var(--line-strong);
-    padding:10px 14px 4px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 18px 8px;
     font-family:Arial, sans-serif;
+    box-shadow:0 2px 12px rgba(0,0,0,0.06);
   }
   .notes-box .notes-title{
     font-size:12px;
@@ -455,43 +469,52 @@
   }
   .auth-card{
     background:var(--surface);
-    border:1.5px solid var(--line-strong);
-    border-radius:8px;
-    padding:32px 28px;
-    width:270px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:36px 32px;
+    width:290px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06);
   }
   .auth-card h2{
-    margin:0 0 18px;
+    margin:0 0 20px;
     color:var(--ink);
     font-family:'Georgia', serif;
-    font-size:26px;
+    font-size:28px;
   }
   .auth-card input{
     display:block;
     width:100%;
-    margin-bottom:10px;
-    padding:9px 10px;
-    border:1px solid var(--line-strong);
-    border-radius:4px;
-    background:transparent;
+    margin-bottom:12px;
+    padding:11px 13px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--bg);
     color:var(--ink-strong);
     font-family:Arial, sans-serif;
     font-size:13px;
     outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .auth-card input:focus{
+    border-color:var(--ink);
+    box-shadow:0 0 0 3px rgba(74,114,176,0.15);
   }
   .auth-submit{
     width:100%;
     background:var(--ink);
     color:var(--bg);
     border:none;
-    padding:10px;
-    border-radius:4px;
+    padding:11px;
+    border-radius:8px;
     font-weight:700;
     cursor:pointer;
-    margin-top:4px;
+    margin-top:6px;
     font-family:Arial, sans-serif;
     font-size:13px;
+    transition:transform .1s ease, opacity .15s ease;
   }
+  .auth-submit:hover{ opacity:0.9; }
+  .auth-submit:active{ transform:scale(0.98); }
   .auth-submit:disabled{ opacity:0.6; cursor:default; }
   .auth-switch{
     font-size:12px;
@@ -597,8 +620,8 @@
   <div class="auth-card">
     <h2 id="authTitle">Log in</h2>
     <div class="auth-error" id="authError"></div>
-    <input id="authUsername" placeholder="Username" autocomplete="username">
-    <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password">
+    <input id="authUsername" placeholder="Username" autocomplete="username" maxlength="30">
+    <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" maxlength="100">
     <p style="font-size:11px;color:var(--muted);margin:-4px 0 10px;">Username: 3+ characters. Password: 6+ characters with letters and numbers.</p>
     <button class="auth-submit" id="authSubmit">Log in</button>
     <p class="auth-switch">Don't have an account? <a id="authSwitchLink">Sign up</a></p>
@@ -611,9 +634,9 @@
     <p style="font-size:12px;color:var(--muted);margin:-6px 0 14px;">Logged in as <strong id="profileUsernameDisplay" style="color:var(--ink)"></strong></p>
     <div class="auth-error" id="profileError"></div>
     <div class="auth-success" id="profileSuccess" style="color:#2e7d32;font-size:12px;margin-bottom:10px;min-height:14px;"></div>
-    <input id="profileNewUsername" placeholder="New username (optional)">
-    <input id="profileNewPassword" type="password" placeholder="New password (optional)">
-    <input id="profileCurrentPassword" type="password" placeholder="Current password (required)" autocomplete="current-password">
+    <input id="profileNewUsername" placeholder="New username (optional)" maxlength="30">
+    <input id="profileNewPassword" type="password" placeholder="New password (optional)" maxlength="100">
+    <input id="profileCurrentPassword" type="password" placeholder="Current password (required)" autocomplete="current-password" maxlength="100">
     <button class="auth-submit" id="profileSubmit">Save changes</button>
     <p class="auth-switch"><a id="profileCloseLink">Close</a></p>
   </div>
@@ -692,8 +715,8 @@
 
   <div class="notes-box">
     <div class="notes-title">NOTES :</div>
-    <input data-note="0" placeholder="">
-    <input data-note="1" placeholder="">
+    <input data-note="0" placeholder="" maxlength="200">
+    <input data-note="1" placeholder="" maxlength="200">
   </div>
 
   </div>
@@ -788,11 +811,20 @@ function setAuthMode(mode){
 }
 document.getElementById("authSwitchLink").addEventListener("click", () => setAuthMode("signup"));
 
+let authFailCount = 0;
+let authCooldownUntil = 0;
+
 document.getElementById("authSubmit").addEventListener("click", async () => {
   const username = document.getElementById("authUsername").value.trim();
   const password = document.getElementById("authPassword").value;
   const errorEl = document.getElementById("authError");
   errorEl.textContent = "";
+
+  if(Date.now() < authCooldownUntil){
+    const waitSec = Math.ceil((authCooldownUntil - Date.now()) / 1000);
+    errorEl.textContent = "Too many attempts. Please wait " + waitSec + "s and try again.";
+    return;
+  }
   if(!username || !password){
     errorEl.textContent = "Please fill in both fields.";
     return;
@@ -833,8 +865,14 @@ document.getElementById("authSubmit").addEventListener("click", async () => {
     } else {
       await signInWithEmailAndPassword(auth, email, password);
     }
+    authFailCount = 0;
   }catch(err){
     errorEl.textContent = friendlyAuthError(err);
+    authFailCount++;
+    if(authFailCount >= 5){
+      authCooldownUntil = Date.now() + 30000;
+      errorEl.textContent = "Too many failed attempts. Please wait 30s and try again.";
+    }
   }
   submitBtn.disabled = false;
 });
@@ -947,6 +985,12 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 const REAL_TODAY = new Date();
+
+function escapeHtml(str){
+  const div = document.createElement("div");
+  div.textContent = str == null ? "" : String(str);
+  return div.innerHTML;
+}
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const SLEEP_LABELS = ["9 hrs","8 hrs","7 hrs","6 hrs","5 hrs"];
 const SLEEP_VALUES = [9,8,7,6,5];
@@ -1029,7 +1073,8 @@ function renderHabits(){
     labelTd.className = "label-cell";
     const input = document.createElement("input");
     input.value = label;
-    input.addEventListener("input", e => { habitLabels[hi] = e.target.value; save(); });
+    input.maxLength = 40;
+    input.addEventListener("input", e => { habitLabels[hi] = e.target.value.slice(0, 40); save(); });
     labelTd.appendChild(input);
     tr.appendChild(labelTd);
 
@@ -1443,10 +1488,11 @@ function generateReport(y, m){
 }
 function renderReportCard(report){
   const el = document.getElementById("reportOutput");
+  const safeBestHabit = escapeHtml(report.bestHabit);
   el.innerHTML =
-    '<div class="report-card"><h3>' + report.monthName + ' Report</h3>' +
+    '<div class="report-card"><h3>' + escapeHtml(report.monthName) + ' Report</h3>' +
     '<div class="report-row"><span>Overall completion</span><span>' + report.completionPct.toFixed(0) + '%</span></div>' +
-    '<div class="report-row"><span>Best habit</span><span>' + (report.bestHabit || '—') + (report.bestHabit ? ' (' + report.bestHabitPct.toFixed(0) + '%)' : '') + '</span></div>' +
+    '<div class="report-row"><span>Best habit</span><span>' + (report.bestHabit ? safeBestHabit : '—') + (report.bestHabit ? ' (' + report.bestHabitPct.toFixed(0) + '%)' : '') + '</span></div>' +
     '<div class="report-row"><span>Average sleep</span><span>' + (report.avgSleep !== null ? report.avgSleep.toFixed(1) + ' hrs' : '—') + '</span></div>' +
     '<div class="report-row"><span>Longest streak</span><span>' + report.longestStreak + ' days</span></div>' +
     '</div>';
