@@ -153,10 +153,13 @@
   .grid-wrap{
     overflow-x:auto;
     margin-bottom:30px;
+    -webkit-overflow-scrolling:touch;
   }
   table{
     border-collapse:collapse;
-    width:100%;
+    width:auto;
+    min-width:940px;
+    table-layout:fixed;
   }
   thead th{
     font-family:Arial, sans-serif;
@@ -640,6 +643,9 @@
     .topbar{ flex-direction:column; }
     .right-controls{ align-items:flex-start; }
     .date-box{ text-align:left; }
+    .hero-band{ padding:28px 18px 40px; margin:-30px -16px 22px; }
+    .habits-overview-row{ flex-direction:column; }
+    .overview-card{ width:100%; min-width:0; }
   }
 </style>
 </head>
@@ -711,7 +717,7 @@
 
   <div id="viewTracker">
 
-  <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:8px">
+  <div class="habits-overview-row" style="display:flex;gap:16px;align-items:flex-start;margin-bottom:8px">
     <div class="grid-wrap" style="flex:1;margin-bottom:0">
       <table id="habitsTable">
         <thead><tr id="habitsHead"><th class="label-col section-label">HABITS / DAYS</th></tr></thead>
