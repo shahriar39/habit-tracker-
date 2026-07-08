@@ -7,31 +7,31 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234a72b0'/%3E%3Cpath d='M32 8 C20 24 14 36 18 46 C20 53 26 58 32 58 C39 58 45 53 46 46 C49 36 44 24 32 8 Z' fill='%23faf4ec'/%3E%3Cpath d='M32 28 C27 35 24 41 26 47 C27 51 29 53 32 53 C35 53 38 51 38 47 C39 41 37 35 32 28 Z' fill='%234a72b0'/%3E%3C/svg%3E">
 <style>
   :root{
-    --bg:#faf4ec;
-    --ink:#4a72b0;
-    --ink-strong:#3a5c92;
-    --line:#c7d6ec;
-    --line-strong:#4a72b0;
+    --bg:#f5faf9;
+    --ink:#0f766e;
+    --ink-strong:#0c4a44;
+    --line:#d3ece7;
+    --line-strong:#0f766e;
     --surface:#ffffff;
-    --check:#4a72b0;
-    --muted:#8fa6c9;
+    --check:#0f766e;
+    --muted:#6b9891;
   }
   body.dark{
-    --bg:#161a22;
-    --ink:#8fb2e8;
-    --ink-strong:#bcd4f7;
-    --line:#2b3346;
-    --line-strong:#5b83c4;
-    --surface:#1d2330;
-    --check:#8fb2e8;
-    --muted:#5c6c8a;
+    --bg:#0b1f1c;
+    --ink:#5eead4;
+    --ink-strong:#d1fdf5;
+    --line:#123832;
+    --line-strong:#2dd4bf;
+    --surface:#122824;
+    --check:#5eead4;
+    --muted:#7ab8ac;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
     background:var(--bg);
     color:var(--ink-strong);
-    font-family:'Georgia', 'Times New Roman', serif;
+    font-family:'Helvetica Neue', Arial, sans-serif;
     padding:30px 16px 60px;
     transition:background .25s ease, color .25s ease;
   }
@@ -40,6 +40,34 @@
     margin:0 auto;
     padding:0 24px;
   }
+  .hero-band{
+    position:relative;
+    margin:-30px -24px 26px;
+    padding:40px 24px 60px;
+    background:linear-gradient(160deg, #0f766e 0%, #14b8a6 45%, #7dd3c8 100%);
+    border-radius:0 0 28px 28px;
+    overflow:hidden;
+  }
+  body.dark .hero-band{
+    background:linear-gradient(160deg, #04140f 0%, #0f3d34 45%, #145c4f 100%);
+  }
+  .hero-band::before, .hero-band::after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,0.18);
+    filter:blur(2px);
+  }
+  .hero-band::before{ width:180px; height:70px; top:20px; left:-40px; }
+  .hero-band::after{ width:240px; height:90px; bottom:-30px; right:-50px; }
+  .hero-band h1{ color:#ffffff; }
+  .hero-band .greeting{ color:#ecfffb; }
+  .hero-band .page-nav-btn{ border-color:rgba(255,255,255,0.6); color:#ffffff; }
+  .hero-band .page-nav-btn.active{ background:#ffffff; color:#0f766e; }
+  .hero-band .mode-toggle button{ border-color:rgba(255,255,255,0.6); color:#ffffff; }
+  .hero-band .mode-toggle button.active{ background:#ffffff; color:#0f766e; }
+  .hero-band .date-box label{ color:#ecfffb; }
+  .hero-band .date-box .date-display{ background:rgba(255,255,255,0.95); border-color:transparent; }
   .topbar{
     display:flex;
     justify-content:space-between;
@@ -47,6 +75,8 @@
     margin-bottom:26px;
     gap:16px;
     flex-wrap:wrap;
+    position:relative;
+    z-index:1;
   }
   h1{
     font-size:52px;
@@ -272,7 +302,7 @@
     font-size:16px;
     font-weight:700;
     color:var(--ink);
-    font-family:'Georgia', serif;
+    font-family:'Helvetica Neue', Arial, sans-serif;font-weight:800;
   }
   .page-nav{
     display:flex;
@@ -327,7 +357,7 @@
     font-weight:700;
     color:var(--ink);
     margin-bottom:8px;
-    font-family:'Georgia', serif;
+    font-family:'Helvetica Neue', Arial, sans-serif;font-weight:800;
   }
   .insight-sub{
     font-size:12px;
@@ -380,7 +410,7 @@
     margin-top:6px;
   }
   .report-card h3{
-    font-family:'Georgia', serif;
+    font-family:'Helvetica Neue', Arial, sans-serif;font-weight:800;
     color:var(--ink);
     margin:0 0 12px;
     font-size:20px;
@@ -460,12 +490,15 @@
   .auth-overlay{
     position:fixed;
     inset:0;
-    background:var(--bg);
+    background:linear-gradient(160deg, #0f766e 0%, #14b8a6 45%, #7dd3c8 100%);
     display:flex;
     align-items:center;
     justify-content:center;
     z-index:100;
     font-family:Arial, sans-serif;
+  }
+  body.dark .auth-overlay{
+    background:linear-gradient(160deg, #04140f 0%, #0f3d34 45%, #145c4f 100%);
   }
   .auth-card{
     background:var(--surface);
@@ -478,7 +511,7 @@
   .auth-card h2{
     margin:0 0 20px;
     color:var(--ink);
-    font-family:'Georgia', serif;
+    font-family:'Helvetica Neue', Arial, sans-serif;font-weight:800;
     font-size:28px;
   }
   .auth-card input{
@@ -643,7 +676,7 @@
 </div>
 
 <div class="sheet" id="appSheet" style="display:none">
-  <div class="topbar">
+  <div class="topbar hero-band">
     <h1>habit<br>tracker</h1>
     <div class="topbar-center">
       <div class="greeting" id="greetingText"></div>
@@ -717,6 +750,11 @@
     <div class="notes-title">NOTES :</div>
     <input data-note="0" placeholder="" maxlength="200">
     <input data-note="1" placeholder="" maxlength="200">
+  </div>
+
+  <div class="footer" style="justify-content:center;margin-top:30px">
+    <a href="https://www.instagram.com/niloy.39/" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://x.com/niloy_39" target="_blank" rel="noopener">X</a>
   </div>
 
   </div>
