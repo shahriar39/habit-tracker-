@@ -708,7 +708,7 @@
 <body>
 
 <div id="sessionLoading" class="auth-overlay">
-  <div style="color:var(--ink);font-family:Arial, sans-serif;font-size:13px;">Loadingâ€¦</div>
+  <div style="color:var(--ink);font-family:Arial, sans-serif;font-size:13px;">Loading...</div>
 </div>
 
 <div id="authOverlay" class="auth-overlay" style="display:none">
@@ -757,9 +757,9 @@
       <div class="date-box">
         <label>MONTH</label>
         <div class="date-display" id="monthDisplay" style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-          <button id="prevMonth" class="month-nav">â€¹</button>
+          <button id="prevMonth" class="month-nav">&lsaquo;</button>
           <span id="monthLabel"></span>
-          <button id="nextMonth" class="month-nav">â€º</button>
+          <button id="nextMonth" class="month-nav">&rsaquo;</button>
         </div>
       </div>
     </div>
@@ -855,7 +855,7 @@
 
   </div>
 
-  <div class="status" id="status">Loadingâ€¦</div>
+  <div class="status" id="status">Loading...</div>
 </div>
 
 
@@ -1182,11 +1182,11 @@ function renderHabits(){
       const isFuture = todayDate !== -1 && (d+1) > todayDate;
       const td = document.createElement("td");
       td.className = "cell" + (d+1 === todayDate ? " today" : "") + (isFuture ? " future" : "");
-      td.textContent = md.habitMarks[hi][d] ? "âœ“" : "";
+      td.textContent = md.habitMarks[hi][d] ? "\u2713" : "";
       if(!isFuture){
         td.addEventListener("click", () => {
           md.habitMarks[hi][d] = !md.habitMarks[hi][d];
-          td.textContent = md.habitMarks[hi][d] ? "âœ“" : "";
+          td.textContent = md.habitMarks[hi][d] ? "\u2713" : "";
           if(md.habitMarks[hi][d]) recordCheckinIfToday(d);
           save();
           renderHabitsOverview();
@@ -1359,7 +1359,7 @@ function updateSleepSummary(md, n){
   const el = document.getElementById("sleepSummary");
   el.textContent = count > 0
     ? "Average sleep this month: " + (total/count).toFixed(1) + " hrs (" + count + " day" + (count>1?"s":"") + " logged)"
-    : "Average sleep this month: â€”";
+    : "Average sleep this month: -";
 }
 
 function drawSleepOverlay(md, n){
@@ -1540,7 +1540,7 @@ function renderMonthComparison(){
   const current = getMonthStats(cy, cm);
   const prev = getMonthStats(py, pm);
   if(!prev.hasData || !current.hasData){
-    el.textContent = "Not enough history yet â€” keep tracking for a month or two.";
+    el.textContent = "Not enough history yet - keep tracking for a month or two.";
     return;
   }
   const lines = [];
@@ -1592,8 +1592,8 @@ function renderReportCard(report){
   el.innerHTML =
     '<div class="report-card"><h3>' + escapeHtml(report.monthName) + ' Report</h3>' +
     '<div class="report-row"><span>Overall completion</span><span>' + report.completionPct.toFixed(0) + '%</span></div>' +
-    '<div class="report-row"><span>Best habit</span><span>' + (report.bestHabit ? safeBestHabit : 'â€”') + (report.bestHabit ? ' (' + report.bestHabitPct.toFixed(0) + '%)' : '') + '</span></div>' +
-    '<div class="report-row"><span>Average sleep</span><span>' + (report.avgSleep !== null ? report.avgSleep.toFixed(1) + ' hrs' : 'â€”') + '</span></div>' +
+    '<div class="report-row"><span>Best habit</span><span>' + (report.bestHabit ? safeBestHabit : '-') + (report.bestHabit ? ' (' + report.bestHabitPct.toFixed(0) + '%)' : '') + '</span></div>' +
+    '<div class="report-row"><span>Average sleep</span><span>' + (report.avgSleep !== null ? report.avgSleep.toFixed(1) + ' hrs' : '-') + '</span></div>' +
     '<div class="report-row"><span>Longest streak</span><span>' + report.longestStreak + ' days</span></div>' +
     '</div>';
 }
@@ -1608,7 +1608,7 @@ function checkReportBanner(){
   if(pm < 0){ pm = 11; py--; }
   const dismissKey = "report-banner-dismissed-" + py + "-" + pm;
   if(sessionStorage.getItem(dismissKey)){ banner.style.display = "none"; return; }
-  document.getElementById("reportBannerText").textContent = "It's a new month â€” want to generate your " + MONTH_NAMES[pm] + " report?";
+  document.getElementById("reportBannerText").textContent = "It's a new month - want to generate your " + MONTH_NAMES[pm] + " report?";
   banner.style.display = "flex";
   banner.dataset.py = py; banner.dataset.pm = pm; banner.dataset.dismissKey = dismissKey;
 }
@@ -1647,7 +1647,7 @@ function computeAverageCheckinTime(){
 function updateReminderStatusText(){
   const el = document.getElementById("reminderStatusText");
   if(!remindersEnabled){
-    el.textContent = "Learns the time you usually check in, and reminds you around then â€” no need to set a fixed time.";
+    el.textContent = "Learns the time you usually check in, and reminds you around then - no need to set a fixed time.";
     return;
   }
   const avg = computeAverageCheckinTime();
@@ -1657,7 +1657,7 @@ function updateReminderStatusText(){
     const h = Math.floor(avg / 60), mm = avg % 60;
     const displayH = (h % 12) || 12;
     const ampm = h >= 12 ? "PM" : "AM";
-    el.textContent = "Reminders are on â€” we'll nudge you around " + displayH + ":" + String(mm).padStart(2, "0") + " " + ampm + " if you haven't checked in yet. (Only works while this tab stays open.)";
+    el.textContent = "Reminders are on - we'll nudge you around " + displayH + ":" + String(mm).padStart(2, "0") + " " + ampm + " if you haven't checked in yet. (Only works while this tab stays open.)";
   }
 }
 function startReminderWatcher(){
@@ -1744,7 +1744,7 @@ function save(){
   saveTimer = setTimeout(async () => {
     if(!currentUid) return;
     try{
-      statusEl.textContent = "Savingâ€¦";
+      statusEl.textContent = "Saving...";
       await setDoc(doc(db, "users", currentUid), {
         username: currentUsername,
         dataJSON: JSON.stringify({ habitLabels, monthsData, theme }),
@@ -1752,14 +1752,14 @@ function save(){
       });
       statusEl.textContent = "Saved";
     }catch(err){
-      statusEl.textContent = "Saved on this device only â€” sync error: " + (err.code || err.message || "unknown error");
+      statusEl.textContent = "Saved on this device only - sync error: " + (err.code || err.message || "unknown error");
     }
   }, 400);
 }
 
 async function loadFromFirestore(){
   const statusEl = document.getElementById("status");
-  statusEl.textContent = "Loadingâ€¦";
+  statusEl.textContent = "Loading...";
 
   let localData = null;
   try{
@@ -1805,7 +1805,7 @@ async function loadFromFirestore(){
     // Local is newer (a previous save never made it to the cloud) â€” keep it and repair the cloud
     statusEl.textContent = cloudReachable
       ? "Ready"
-      : "Ready (offline copy â€” will sync when possible)";
+      : "Ready (offline copy - will sync when possible)";
     if(cloudReachable){
       try{
         await setDoc(doc(db, "users", currentUid), {
