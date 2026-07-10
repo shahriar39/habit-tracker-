@@ -7,35 +7,48 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234a72b0'/%3E%3Cpath d='M32 8 C20 24 14 36 18 46 C20 53 26 58 32 58 C39 58 45 53 46 46 C49 36 44 24 32 8 Z' fill='%23faf4ec'/%3E%3Cpath d='M32 28 C27 35 24 41 26 47 C27 51 29 53 32 53 C35 53 38 51 38 47 C39 41 37 35 32 28 Z' fill='%234a72b0'/%3E%3C/svg%3E">
 <style>
   :root{
-    --bg:#f5faf9;
-    --ink:#0f766e;
-    --ink-strong:#0c4a44;
-    --line:#d3ece7;
-    --line-strong:#0f766e;
-    --surface:#ffffff;
-    --check:#0f766e;
-    --muted:#6b9891;
+    --bg:#eef7ff;
+    --ink:#2563eb;
+    --ink-strong:#0f2f68;
+    --line:rgba(96,165,250,0.24);
+    --line-strong:#3b82f6;
+    --surface:rgba(255,255,255,0.72);
+    --check:#2563eb;
+    --muted:#5f7fa8;
+    --glass-border:rgba(255,255,255,0.68);
+    --glass-shadow:0 18px 45px rgba(37,99,235,0.14);
     --label-col:160px;
     --day-col:30px;
   }
   body.dark{
-    --bg:#0b1f1c;
-    --ink:#5eead4;
-    --ink-strong:#d1fdf5;
-    --line:#123832;
-    --line-strong:#2dd4bf;
-    --surface:#122824;
-    --check:#5eead4;
-    --muted:#7ab8ac;
+    --bg:#071529;
+    --ink:#93c5fd;
+    --ink-strong:#eaf4ff;
+    --line:rgba(147,197,253,0.22);
+    --line-strong:#60a5fa;
+    --surface:rgba(15,35,66,0.72);
+    --check:#93c5fd;
+    --muted:#a8c6eb;
+    --glass-border:rgba(147,197,253,0.24);
+    --glass-shadow:0 18px 45px rgba(0,0,0,0.24);
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
-    background:var(--bg);
+    background:
+      radial-gradient(circle at 12% 8%, rgba(147,197,253,0.48), transparent 32%),
+      radial-gradient(circle at 84% 4%, rgba(255,255,255,0.9), transparent 28%),
+      linear-gradient(135deg, #f8fbff 0%, var(--bg) 48%, #e2f0ff 100%);
     color:var(--ink-strong);
     font-family:'Helvetica Neue', Arial, sans-serif;
     padding:30px 16px 60px;
     transition:background .25s ease, color .25s ease;
+  }
+  body.dark{
+    background:
+      radial-gradient(circle at 12% 8%, rgba(59,130,246,0.22), transparent 34%),
+      radial-gradient(circle at 84% 4%, rgba(147,197,253,0.12), transparent 30%),
+      linear-gradient(135deg, #06101f 0%, var(--bg) 52%, #0d2548 100%);
   }
   .sheet{
     max-width:1600px;
@@ -46,12 +59,16 @@
     position:relative;
     margin:-30px -24px 26px;
     padding:40px 24px 60px;
-    background:linear-gradient(160deg, #0f766e 0%, #14b8a6 45%, #7dd3c8 100%);
+    background:linear-gradient(145deg, rgba(255,255,255,0.34) 0%, rgba(96,165,250,0.36) 46%, rgba(37,99,235,0.72) 100%);
+    border:1px solid var(--glass-border);
     border-radius:0 0 28px 28px;
+    box-shadow:var(--glass-shadow);
+    backdrop-filter:blur(18px) saturate(150%);
+    -webkit-backdrop-filter:blur(18px) saturate(150%);
     overflow:hidden;
   }
   body.dark .hero-band{
-    background:linear-gradient(160deg, #04140f 0%, #0f3d34 45%, #145c4f 100%);
+    background:linear-gradient(145deg, rgba(15,35,66,0.82) 0%, rgba(30,64,175,0.48) 48%, rgba(96,165,250,0.22) 100%);
   }
   .hero-band::before, .hero-band::after{
     content:"";
@@ -65,9 +82,9 @@
   .hero-band h1{ color:#ffffff; }
   .hero-band .greeting{ color:#ecfffb; }
   .hero-band .page-nav-btn{ border-color:rgba(255,255,255,0.6); color:#ffffff; }
-  .hero-band .page-nav-btn.active{ background:#ffffff; color:#0f766e; }
+  .hero-band .page-nav-btn.active{ background:#ffffff; color:#2563eb; }
   .hero-band .mode-toggle button{ border-color:rgba(255,255,255,0.6); color:#ffffff; }
-  .hero-band .mode-toggle button.active{ background:#ffffff; color:#0f766e; }
+  .hero-band .mode-toggle button.active{ background:#ffffff; color:#2563eb; }
   .hero-band .date-box label{ color:#ecfffb; }
   .hero-band .date-box .date-display{ background:rgba(255,255,255,0.95); border-color:transparent; }
   .topbar{
@@ -275,7 +292,9 @@
     background:var(--surface);
     font-family:Arial, sans-serif;
     min-width:230px;
-    box-shadow:0 2px 12px rgba(0,0,0,0.08);
+    box-shadow:var(--glass-shadow);
+    backdrop-filter:blur(16px) saturate(145%);
+    -webkit-backdrop-filter:blur(16px) saturate(145%);
   }
   .overview-title{
     font-size:12px;
@@ -364,7 +383,9 @@
     background:var(--surface);
     font-family:Arial, sans-serif;
     margin-bottom:18px;
-    box-shadow:0 2px 12px rgba(0,0,0,0.08);
+    box-shadow:var(--glass-shadow);
+    backdrop-filter:blur(16px) saturate(145%);
+    -webkit-backdrop-filter:blur(16px) saturate(145%);
     transition:box-shadow .2s ease;
   }
   .insight-card:hover{
@@ -393,32 +414,39 @@
     flex-direction:column;
     align-items:center;
     gap:6px;
-    width:84px;
+    width:108px;
     text-align:center;
   }
   .badge-icon{
-    width:56px;
-    height:56px;
+    width:72px;
+    height:72px;
     border-radius:50%;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:22px;
+    font-size:18px;
+    font-weight:800;
+    color:var(--ink);
+    background:rgba(255,255,255,0.52);
     border:2px solid var(--line-strong);
+    box-shadow:inset 0 1px 10px rgba(255,255,255,0.52);
   }
   .badge.locked .badge-icon{
-    opacity:0.25;
-    filter:grayscale(1);
+    opacity:0.48;
+    filter:none;
+    color:var(--muted);
+    border-color:rgba(95,127,168,0.34);
   }
   .badge.unlocked .badge-icon{
-    background:var(--ink);
-    color:var(--bg);
+    background:linear-gradient(145deg, #ffffff 0%, #bfdbfe 42%, var(--ink) 100%);
+    color:#ffffff;
     border-color:var(--ink);
   }
   .badge-label{
-    font-size:10px;
+    font-size:13px;
     color:var(--muted);
-    line-height:1.3;
+    line-height:1.25;
+    font-weight:700;
   }
   .report-card{
     border:1.2px solid var(--line-strong);
@@ -447,7 +475,10 @@
     border-radius:14px;
     padding:14px 18px 8px;
     font-family:Arial, sans-serif;
-    box-shadow:0 2px 12px rgba(0,0,0,0.06);
+    background:var(--surface);
+    box-shadow:var(--glass-shadow);
+    backdrop-filter:blur(16px) saturate(145%);
+    -webkit-backdrop-filter:blur(16px) saturate(145%);
   }
   .notes-box .notes-title{
     font-size:12px;
@@ -508,7 +539,9 @@
   .auth-overlay{
     position:fixed;
     inset:0;
-    background:linear-gradient(160deg, #0f766e 0%, #14b8a6 45%, #7dd3c8 100%);
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.84), transparent 30%),
+      linear-gradient(145deg, #dbeafe 0%, #93c5fd 48%, #2563eb 100%);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -524,7 +557,9 @@
     border-radius:16px;
     padding:36px 32px;
     width:290px;
-    box-shadow:0 4px 24px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06);
+    box-shadow:var(--glass-shadow);
+    backdrop-filter:blur(18px) saturate(150%);
+    -webkit-backdrop-filter:blur(18px) saturate(150%);
   }
   .auth-card h2{
     margin:0 0 20px;
@@ -806,7 +841,7 @@
     </table>
     <svg id="sleepOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible"></svg>
   </div>
-  <div class="sleep-summary" id="sleepSummary">Average sleep this month: â€”</div>
+  <div class="sleep-summary" id="sleepSummary">Average sleep this month: -</div>
 
   <div class="notes-box">
     <div class="notes-title">NOTES :</div>
@@ -834,7 +869,7 @@
 
     <div class="insight-card">
       <div class="insight-title">Month-over-Month</div>
-      <div id="monthCompareText" class="insight-sub">Not enough history yet â€” keep tracking for a month or two.</div>
+      <div id="monthCompareText" class="insight-sub">Not enough history yet - keep tracking for a month or two.</div>
     </div>
 
     <div class="insight-card">
@@ -844,7 +879,7 @@
 
     <div class="insight-card">
       <div class="insight-title">Smart Reminders</div>
-      <p class="insight-sub" id="reminderStatusText">Learns the time you usually check in, and reminds you around then â€” no need to set a fixed time.</p>
+      <p class="insight-sub" id="reminderStatusText">Learns the time you usually check in, and reminds you around then - no need to set a fixed time.</p>
       <button class="btn" id="enableReminderBtn">Enable smart reminders</button>
     </div>
 
@@ -1365,10 +1400,15 @@ function updateSleepSummary(md, n){
 function drawSleepOverlay(md, n){
   const wrap = document.getElementById("sleepGridWrap");
   const svg = document.getElementById("sleepOverlay");
-  const wrapRect = wrap.getBoundingClientRect();
-  svg.setAttribute("width", wrapRect.width);
-  svg.setAttribute("height", wrapRect.height);
-  svg.setAttribute("viewBox", "0 0 " + wrapRect.width + " " + wrapRect.height);
+  const table = document.getElementById("sleepTable");
+  const tableRect = table.getBoundingClientRect();
+  const gridWidth = table.offsetWidth;
+  const gridHeight = table.offsetHeight;
+  svg.style.width = gridWidth + "px";
+  svg.style.height = gridHeight + "px";
+  svg.setAttribute("width", gridWidth);
+  svg.setAttribute("height", gridHeight);
+  svg.setAttribute("viewBox", "0 0 " + gridWidth + " " + gridHeight);
 
   const points = [];
   for(let d=0; d<n; d++){
@@ -1378,8 +1418,8 @@ function drawSleepOverlay(md, n){
         if(cell){
           const r = cell.getBoundingClientRect();
           points.push({
-            x: r.left - wrapRect.left + r.width / 2,
-            y: r.top - wrapRect.top + r.height / 2,
+            x: r.left - tableRect.left + r.width / 2,
+            y: r.top - tableRect.top + r.height / 2,
             day: d,
             value: SLEEP_VALUES[si]
           });
@@ -1489,10 +1529,10 @@ function computeStreaks(hi){
 function renderBadgeShelf(){
   const container = document.getElementById("badgeShelf");
   const thresholds = [
-    { days: 7, icon: "ðŸ”¥", label: "7-day streak" },
-    { days: 30, icon: "â­", label: "30-day streak" },
-    { days: 100, icon: "ðŸ†", label: "100-day streak" },
-    { days: 365, icon: "ðŸ‘‘", label: "365-day streak" }
+    { days: 7, icon: "7", label: "7-day streak" },
+    { days: 30, icon: "30", label: "30-day streak" },
+    { days: 100, icon: "100", label: "100-day streak" },
+    { days: 365, icon: "365", label: "365-day streak" }
   ];
   let bestLongest = 0;
   habitLabels.forEach((label, hi) => {
@@ -1674,7 +1714,7 @@ function startReminderWatcher(){
       const todayIndex = REAL_TODAY.getDate() - 1;
       const allDone = habitLabels.every((_, hi) => todayMd.habitMarks[hi] && todayMd.habitMarks[hi][todayIndex]);
       if(!allDone){
-        new Notification("Habit Tracker", { body: "It's about your usual time â€” don't forget to check in today!" });
+        new Notification("Habit Tracker", { body: "It's about your usual time - don't forget to check in today!" });
       }
       lastReminderDateStr = todayStr;
     }
@@ -1795,14 +1835,14 @@ async function loadFromFirestore(){
   const cloudTime = cloudUpdatedAt;
 
   if(cloudReachable && cloudPayload && cloudTime >= localTime){
-    // Cloud is newer or equal â€” trust it
+    // Cloud is newer or equal - trust it
     if(cloudPayload.habitLabels) habitLabels = cloudPayload.habitLabels;
     if(cloudPayload.monthsData) monthsData = cloudPayload.monthsData;
     if(cloudPayload.theme) theme = cloudPayload.theme;
     saveLocalCache(cloudTime);
     statusEl.textContent = "Ready";
   } else if(localData && localTime > cloudTime){
-    // Local is newer (a previous save never made it to the cloud) â€” keep it and repair the cloud
+    // Local is newer (a previous save never made it to the cloud) - keep it and repair the cloud
     statusEl.textContent = cloudReachable
       ? "Ready"
       : "Ready (offline copy - will sync when possible)";
@@ -1827,3 +1867,4 @@ async function loadFromFirestore(){
 </script>
 </body>
 </html>
+
