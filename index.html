@@ -7,17 +7,17 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234a72b0'/%3E%3Cpath d='M32 8 C20 24 14 36 18 46 C20 53 26 58 32 58 C39 58 45 53 46 46 C49 36 44 24 32 8 Z' fill='%23faf4ec'/%3E%3Cpath d='M32 28 C27 35 24 41 26 47 C27 51 29 53 32 53 C35 53 38 51 38 47 C39 41 37 35 32 28 Z' fill='%234a72b0'/%3E%3C/svg%3E">
 <style>
   :root{
-    --bg:#030735;
-    --ink:#c7ddff;
-    --ink-strong:#ffffff;
-    --line:rgba(205,222,255,0.18);
-    --line-strong:rgba(226,237,255,0.58);
-    --surface:rgba(13,28,91,0.34);
-    --check:#ffffff;
-    --muted:#a9bff2;
-    --glass-border:rgba(255,255,255,0.26);
-    --glass-highlight:rgba(255,255,255,0.22);
-    --glass-shadow:0 26px 70px rgba(0,0,0,0.42), inset 0 1px 1px rgba(255,255,255,0.22);
+    --bg:#eef5ff;
+    --ink:#1f5fbf;
+    --ink-strong:#0a2f66;
+    --line:rgba(31,95,191,0.18);
+    --line-strong:rgba(31,95,191,0.4);
+    --surface:rgba(255,255,255,0.55);
+    --check:#1f5fbf;
+    --muted:#5b7ba8;
+    --glass-border:rgba(255,255,255,0.65);
+    --glass-highlight:rgba(255,255,255,0.7);
+    --glass-shadow:0 20px 50px rgba(80,120,200,0.18), inset 0 1px 1px rgba(255,255,255,0.7);
     --label-col:160px;
     --day-col:30px;
   }
@@ -38,11 +38,11 @@
   body{
     margin:0;
     background:
-      radial-gradient(ellipse at 10% 8%, rgba(129,92,255,0.58), transparent 34%),
-      radial-gradient(ellipse at 56% 10%, rgba(0,91,255,0.88), transparent 36%),
-      radial-gradient(ellipse at 78% 70%, rgba(94,60,255,0.62), transparent 34%),
-      radial-gradient(ellipse at 18% 82%, rgba(44,110,255,0.64), transparent 38%),
-      linear-gradient(135deg, #020522 0%, #07117a 42%, #020529 100%);
+      radial-gradient(ellipse at 10% 8%, rgba(150,190,255,0.55), transparent 34%),
+      radial-gradient(ellipse at 56% 10%, rgba(120,175,255,0.5), transparent 36%),
+      radial-gradient(ellipse at 78% 70%, rgba(185,215,255,0.5), transparent 34%),
+      radial-gradient(ellipse at 18% 82%, rgba(150,195,255,0.45), transparent 38%),
+      linear-gradient(135deg, #eef5ff 0%, #dbe9ff 42%, #f5faff 100%);
     color:var(--ink-strong);
     font-family:'Helvetica Neue', Arial, sans-serif;
     padding:30px 16px 60px;
@@ -64,9 +64,9 @@
     top:4vw;
     border-radius:48% 52% 58% 42% / 44% 60% 40% 56%;
     background:
-      radial-gradient(circle at 24% 24%, rgba(255,255,255,0.18), transparent 18%),
-      linear-gradient(135deg, rgba(86,66,255,0.95), rgba(0,97,255,0.72) 52%, rgba(181,128,255,0.68));
-    box-shadow:0 0 80px rgba(82,127,255,0.4);
+      radial-gradient(circle at 24% 24%, rgba(255,255,255,0.6), transparent 18%),
+      linear-gradient(135deg, rgba(190,220,255,0.85), rgba(140,190,255,0.6) 52%, rgba(220,235,255,0.6));
+    box-shadow:0 0 80px rgba(150,190,255,0.35);
   }
   body::after{
     width:70vw;
@@ -74,6 +74,18 @@
     right:-18vw;
     bottom:-10vw;
     border-radius:54% 46% 44% 56% / 58% 34% 66% 42%;
+    background:
+      radial-gradient(circle at 32% 30%, rgba(255,255,255,0.65), transparent 20%),
+      linear-gradient(145deg, rgba(210,230,255,0.75), rgba(150,195,255,0.55) 55%, rgba(235,244,255,0.8));
+    box-shadow:0 0 90px rgba(150,190,255,0.3);
+  }
+  body.dark::before{
+    background:
+      radial-gradient(circle at 24% 24%, rgba(255,255,255,0.18), transparent 18%),
+      linear-gradient(135deg, rgba(86,66,255,0.95), rgba(0,97,255,0.72) 52%, rgba(181,128,255,0.68));
+    box-shadow:0 0 80px rgba(82,127,255,0.4);
+  }
+  body.dark::after{
     background:
       radial-gradient(circle at 32% 30%, rgba(255,255,255,0.22), transparent 20%),
       linear-gradient(145deg, rgba(145,111,255,0.82), rgba(0,90,255,0.68) 55%, rgba(11,22,95,0.95));
@@ -97,7 +109,7 @@
     margin:-30px -24px 26px;
     padding:40px 24px 60px;
     background:
-      linear-gradient(145deg, rgba(255,255,255,0.18) 0%, rgba(78,109,255,0.22) 44%, rgba(5,14,80,0.38) 100%);
+      linear-gradient(145deg, rgba(255,255,255,0.5) 0%, rgba(190,220,255,0.42) 44%, rgba(140,180,255,0.32) 100%);
     border:1px solid var(--glass-border);
     border-radius:0 0 28px 28px;
     box-shadow:var(--glass-shadow);
@@ -113,6 +125,8 @@
     position:absolute;
     border-radius:999px;
     filter:blur(8px);
+    pointer-events:none;
+    z-index:0;
   }
   .hero-band::before{
     width:360px;
@@ -130,17 +144,17 @@
     background:linear-gradient(90deg, transparent, rgba(162,132,255,0.32), rgba(255,255,255,0.18));
     transform:rotate(-10deg);
   }
-  .hero-band h1{ color:#ffffff; }
-  .hero-band .greeting{ color:#ecfffb; }
-  .hero-band .page-nav-btn{ border-color:rgba(255,255,255,0.6); color:#ffffff; }
-  .hero-band .page-nav-btn.active{ background:rgba(255,255,255,0.24); color:#ffffff; }
-  .hero-band .mode-toggle button{ border-color:rgba(255,255,255,0.6); color:#ffffff; }
-  .hero-band .mode-toggle button.active{ background:rgba(255,255,255,0.24); color:#ffffff; }
-  .hero-band .date-box label{ color:#ecfffb; }
+  .hero-band h1{ color:var(--ink-strong); }
+  .hero-band .greeting{ color:var(--ink-strong); }
+  .hero-band .page-nav-btn{ border-color:var(--line-strong); color:var(--ink-strong); }
+  .hero-band .page-nav-btn.active{ background:rgba(255,255,255,0.4); color:var(--ink-strong); }
+  .hero-band .mode-toggle button{ border-color:var(--line-strong); color:var(--ink-strong); }
+  .hero-band .mode-toggle button.active{ background:rgba(255,255,255,0.4); color:var(--ink-strong); }
+  .hero-band .date-box label{ color:var(--ink-strong); }
   .hero-band .date-box .date-display{
-    background:rgba(255,255,255,0.16);
-    border-color:rgba(255,255,255,0.24);
-    color:#ffffff;
+    background:rgba(255,255,255,0.4);
+    border-color:var(--glass-border);
+    color:var(--ink-strong);
     backdrop-filter:blur(18px) saturate(160%);
     -webkit-backdrop-filter:blur(18px) saturate(160%);
   }
@@ -232,7 +246,7 @@
     max-width:100%;
     margin-bottom:30px;
     -webkit-overflow-scrolling:touch;
-    background:rgba(255,255,255,0.08);
+    background:var(--surface);
     border:1px solid var(--glass-border);
     border-radius:16px;
     box-shadow:var(--glass-shadow);
@@ -249,7 +263,7 @@
     font-family:Arial, sans-serif;
     font-size:11px;
     font-weight:600;
-    color:#edf5ff;
+    color:var(--ink-strong);
     border:1px solid var(--line);
     width:var(--day-col);
     min-width:var(--day-col);
@@ -257,7 +271,7 @@
     text-align:center;
   }
   thead th.today{
-    background:rgba(255,255,255,0.18);
+    background:rgba(255,255,255,0.3);
     border-radius:3px;
   }
   thead th.label-col{
@@ -266,8 +280,8 @@
     min-width:var(--label-col);
   }
   thead th.section-label{
-    background:rgba(255,255,255,0.18);
-    color:#ffffff;
+    background:var(--ink);
+    color:var(--bg);
     border:1px solid var(--line-strong);
     text-align:left;
     padding-left:10px;
@@ -278,7 +292,7 @@
     font-family:Arial, sans-serif;
     font-size:13px;
     font-weight:700;
-    color:#ffffff;
+    color:var(--ink-strong);
     text-align:right;
     padding:0 14px 0 6px;
     letter-spacing:.03em;
@@ -294,7 +308,7 @@
     font-family:Arial, sans-serif;
     font-size:13px;
     font-weight:700;
-    color:#ffffff;
+    color:var(--ink-strong);
     text-align:right;
     width:100%;
     min-width:0;
@@ -304,7 +318,7 @@
   }
   tbody td.cell{
     border:1px solid var(--line);
-    background:rgba(255,255,255,0.035);
+    background:rgba(255,255,255,0.12);
     height:32px;
     width:var(--day-col);
     min-width:var(--day-col);
@@ -326,13 +340,13 @@
   .row-actions{
     display:flex;
     gap:8px;
-    margin:-18px 0 30px;
+    margin:12px 0 30px;
     font-family:Arial, sans-serif;
   }
   .btn{
     border:1px solid var(--line-strong);
-    background:rgba(255,255,255,0.08);
-    color:#ffffff;
+    background:rgba(255,255,255,0.3);
+    color:var(--ink-strong);
     padding:7px 14px;
     font-size:11px;
     font-weight:700;
@@ -412,8 +426,8 @@
   }
   .page-nav-btn{
     border:1.2px solid var(--line-strong);
-    background:rgba(255,255,255,0.06);
-    color:#ffffff;
+    background:rgba(255,255,255,0.3);
+    color:var(--ink-strong);
     padding:6px 14px;
     font-size:11px;
     font-weight:700;
@@ -423,8 +437,8 @@
     letter-spacing:.03em;
   }
   .page-nav-btn.active{
-    background:rgba(255,255,255,0.22);
-    color:#ffffff;
+    background:rgba(255,255,255,0.55);
+    color:var(--ink-strong);
   }
   .report-banner{
     display:flex;
@@ -492,8 +506,8 @@
     justify-content:center;
     font-size:18px;
     font-weight:800;
-    color:#ffffff;
-    background:rgba(255,255,255,0.12);
+    color:var(--ink-strong);
+    background:rgba(255,255,255,0.35);
     border:2px solid var(--line-strong);
     box-shadow:inset 0 1px 10px rgba(255,255,255,0.52);
   }
@@ -505,7 +519,7 @@
   }
   .badge.unlocked .badge-icon{
     background:linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(129,157,255,0.64) 42%, rgba(57,86,255,0.78) 100%);
-    color:#ffffff;
+    color:var(--ink-strong);
     border-color:var(--ink);
   }
   .badge-label{
@@ -679,6 +693,34 @@
     text-align:center;
   }
   .auth-switch a{ color:var(--ink); cursor:pointer; text-decoration:underline; }
+  .day-chip-row{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .day-chip{
+    border:1px solid var(--line-strong);
+    background:transparent;
+    color:var(--ink-strong);
+    padding:8px 0;
+    width:38px;
+    text-align:center;
+    font-size:11px;
+    font-weight:700;
+    border-radius:8px;
+    cursor:pointer;
+    font-family:Arial, sans-serif;
+  }
+  .day-chip.active{
+    background:var(--ink);
+    color:var(--bg);
+    border-color:var(--ink);
+  }
+  tbody td.cell.unscheduled{
+    opacity:0.35;
+    cursor:default;
+    color:var(--muted);
+  }
   .auth-error{
     color:#c0392b;
     font-size:12px;
@@ -797,7 +839,7 @@
       padding-right:10px;
     }
     .row-actions{
-      margin:-18px 0 24px;
+      margin:10px 0 24px;
       padding-left:0;
     }
     .notes-box{
@@ -839,6 +881,25 @@
     <input id="profileCurrentPassword" type="password" placeholder="Current password (required)" autocomplete="current-password" maxlength="100">
     <button class="auth-submit" id="profileSubmit">Save changes</button>
     <p class="auth-switch"><a id="profileCloseLink">Close</a></p>
+  </div>
+</div>
+
+<div id="frequencyOverlay" class="auth-overlay" style="display:none">
+  <div class="auth-card" style="width:300px">
+    <h2 style="font-size:22px">Frequency</h2>
+    <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px;">Habit: <strong id="frequencyHabitName" style="color:var(--ink)"></strong></p>
+    <label style="display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:6px;">Repeat</label>
+    <select id="frequencyType" style="width:100%;margin-bottom:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink-strong);font-family:Arial, sans-serif;font-size:13px;">
+      <option value="daily">Every day</option>
+      <option value="weekdays">Weekdays (Mon-Fri)</option>
+      <option value="custom">Custom days</option>
+    </select>
+    <div id="frequencyCustomDays" style="display:none;margin-bottom:14px;">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:8px;">Custom days</label>
+      <div class="day-chip-row" id="dayChipRow"></div>
+    </div>
+    <button class="auth-submit" id="frequencySave">Save frequency</button>
+    <p class="auth-switch"><a id="frequencyClose">Close</a></p>
   </div>
 </div>
 
@@ -1063,6 +1124,7 @@ document.getElementById("authSubmit").addEventListener("click", async () => {
       await setDoc(doc(db, "users", cred.user.uid), {
         username: username,
         habitLabels: ["Diet","Water","Workout 1","Workout 2","Book","Study"],
+        habitFrequency: ["Diet","Water","Workout 1","Workout 2","Book","Study"].map(() => ({ type: "daily" })),
         monthsData: {},
         theme: "light",
         updatedAt: Date.now()
@@ -1095,6 +1157,54 @@ document.getElementById("profileBtn").addEventListener("click", () => {
 });
 document.getElementById("profileCloseLink").addEventListener("click", () => {
   document.getElementById("profileOverlay").style.display = "none";
+});
+
+let currentFrequencyHi = null;
+const DAY_CHIP_ORDER = [
+  { dow: 1, label: "Mon" }, { dow: 2, label: "Tue" }, { dow: 3, label: "Wed" },
+  { dow: 4, label: "Thu" }, { dow: 5, label: "Fri" }, { dow: 6, label: "Sat" },
+  { dow: 0, label: "Sun" }
+];
+function openFrequencyModal(hi){
+  currentFrequencyHi = hi;
+  const freq = habitFrequency[hi] || defaultFrequency();
+  document.getElementById("frequencyHabitName").textContent = habitLabels[hi];
+  document.getElementById("frequencyType").value = freq.type || "daily";
+  const chipRow = document.getElementById("dayChipRow");
+  chipRow.innerHTML = "";
+  const selectedDays = new Set(freq.type === "custom" ? (freq.days || []) : []);
+  DAY_CHIP_ORDER.forEach(({ dow, label }) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "day-chip" + (selectedDays.has(dow) ? " active" : "");
+    chip.textContent = label;
+    chip.dataset.dow = dow;
+    chip.addEventListener("click", () => chip.classList.toggle("active"));
+    chipRow.appendChild(chip);
+  });
+  document.getElementById("frequencyCustomDays").style.display = freq.type === "custom" ? "block" : "none";
+  document.getElementById("frequencyOverlay").style.display = "flex";
+}
+document.getElementById("frequencyType").addEventListener("change", e => {
+  document.getElementById("frequencyCustomDays").style.display = e.target.value === "custom" ? "block" : "none";
+});
+document.getElementById("frequencyClose").addEventListener("click", () => {
+  document.getElementById("frequencyOverlay").style.display = "none";
+});
+document.getElementById("frequencySave").addEventListener("click", () => {
+  if(currentFrequencyHi === null) return;
+  const type = document.getElementById("frequencyType").value;
+  let newFreq;
+  if(type === "custom"){
+    const days = Array.from(document.querySelectorAll("#dayChipRow .day-chip.active")).map(c => +c.dataset.dow);
+    newFreq = { type: "custom", days };
+  } else {
+    newFreq = { type };
+  }
+  habitFrequency[currentFrequencyHi] = newFreq;
+  document.getElementById("frequencyOverlay").style.display = "none";
+  renderHabits();
+  save();
 });
 
 document.getElementById("profileSubmit").addEventListener("click", async () => {
@@ -1201,6 +1311,25 @@ const SLEEP_LABELS = ["9 hrs","8 hrs","7 hrs","6 hrs","5 hrs"];
 const SLEEP_VALUES = [9,8,7,6,5];
 
 let habitLabels = ["Diet","Water","Workout 1","Workout 2","Book","Study"];
+let habitFrequency = habitLabels.map(() => ({ type: "daily" }));
+function defaultFrequency(){ return { type: "daily" }; }
+function isHabitScheduled(hi, dateObj){
+  const freq = habitFrequency[hi] || defaultFrequency();
+  if(!freq || freq.type === "daily") return true;
+  const dow = dateObj.getDay(); // 0=Sun ... 6=Sat
+  if(freq.type === "weekdays") return dow >= 1 && dow <= 5;
+  if(freq.type === "custom") return (freq.days || []).includes(dow);
+  return true;
+}
+function frequencyLabel(freq){
+  if(!freq || freq.type === "daily") return "Daily";
+  if(freq.type === "weekdays") return "Weekdays";
+  if(freq.type === "custom"){
+    const names = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    return (freq.days || []).slice().sort().map(d => names[d]).join(", ") || "Custom";
+  }
+  return "Daily";
+}
 let theme = "light";
 let monthsData = {}; // keyed by "YYYY-M" -> { habitMarks:[[...]], sleepMarks:[[...]], notes:["",""] }
 let viewDate = new Date(REAL_TODAY.getFullYear(), REAL_TODAY.getMonth(), 1);
@@ -1285,17 +1414,23 @@ function renderHabits(){
 
     for(let d=0; d<n; d++){
       const isFuture = todayDate !== -1 && (d+1) > todayDate;
+      const cellDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), d+1);
+      const scheduled = isHabitScheduled(hi, cellDate);
       const td = document.createElement("td");
-      td.className = "cell" + (d+1 === todayDate ? " today" : "") + (isFuture ? " future" : "");
-      td.textContent = md.habitMarks[hi][d] ? "\u2713" : "";
-      if(!isFuture){
-        td.addEventListener("click", () => {
-          md.habitMarks[hi][d] = !md.habitMarks[hi][d];
-          td.textContent = md.habitMarks[hi][d] ? "\u2713" : "";
-          if(md.habitMarks[hi][d]) recordCheckinIfToday(d);
-          save();
-          renderHabitsOverview();
-        });
+      td.className = "cell" + (d+1 === todayDate ? " today" : "") + (isFuture ? " future" : "") + (!scheduled ? " unscheduled" : "");
+      if(!scheduled){
+        td.textContent = "-";
+      } else {
+        td.textContent = md.habitMarks[hi][d] ? "\u2713" : "";
+        if(!isFuture){
+          td.addEventListener("click", () => {
+            md.habitMarks[hi][d] = !md.habitMarks[hi][d];
+            td.textContent = md.habitMarks[hi][d] ? "\u2713" : "";
+            if(md.habitMarks[hi][d]) recordCheckinIfToday(d);
+            save();
+            renderHabitsOverview();
+          });
+        }
       }
       tr.appendChild(td);
     }
@@ -1307,9 +1442,11 @@ function renderHabits(){
 function renderHabitsOverview(){
   const todayMd = getMonthData(REAL_TODAY);
   const todayIndex = REAL_TODAY.getDate() - 1;
-  const total = habitLabels.length;
+  let total = 0;
   let completed = 0;
-  for(let hi = 0; hi < total; hi++){
+  for(let hi = 0; hi < habitLabels.length; hi++){
+    if(!isHabitScheduled(hi, REAL_TODAY)) continue;
+    total++;
     if(todayMd.habitMarks[hi] && todayMd.habitMarks[hi][todayIndex]) completed++;
   }
   const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
@@ -1328,6 +1465,8 @@ function renderHabitsOverview(){
 function reorderHabit(fromIndex, toIndex){
   const [movedLabel] = habitLabels.splice(fromIndex, 1);
   habitLabels.splice(toIndex, 0, movedLabel);
+  const [movedFreq] = habitFrequency.splice(fromIndex, 1);
+  habitFrequency.splice(toIndex, 0, movedFreq || defaultFrequency());
   Object.values(monthsData).forEach(md => {
     if(md.habitMarks && md.habitMarks[fromIndex]){
       const [movedMarks] = md.habitMarks.splice(fromIndex, 1);
@@ -1348,12 +1487,20 @@ function showContextMenu(x, y, hi){
   menu.className = "context-menu";
   menu.style.left = x + "px";
   menu.style.top = y + "px";
+  const freqBtn = document.createElement("button");
+  freqBtn.textContent = "Frequency";
+  freqBtn.style.color = "var(--ink)";
+  freqBtn.addEventListener("click", () => {
+    openFrequencyModal(hi);
+    closeContextMenu();
+  });
   const delBtn = document.createElement("button");
   delBtn.textContent = "Delete habit";
   delBtn.addEventListener("click", () => {
     deleteHabit(hi);
     closeContextMenu();
   });
+  menu.appendChild(freqBtn);
   menu.appendChild(delBtn);
   document.body.appendChild(menu);
   contextMenuEl = menu;
@@ -1366,6 +1513,7 @@ function deleteHabit(hi){
   undoData = {
     index: hi,
     label: habitLabels[hi],
+    frequency: habitFrequency[hi],
     marksByMonth: {}
   };
   Object.keys(monthsData).forEach(key => {
@@ -1376,6 +1524,7 @@ function deleteHabit(hi){
   });
 
   habitLabels.splice(hi, 1);
+  habitFrequency.splice(hi, 1);
   Object.values(monthsData).forEach(md => {
     if(md.habitMarks) md.habitMarks.splice(hi, 1);
   });
@@ -1407,6 +1556,7 @@ function removeUndoToast(){
 function undoDelete(){
   if(!undoData) return;
   habitLabels.splice(undoData.index, 0, undoData.label);
+  habitFrequency.splice(undoData.index, 0, undoData.frequency || defaultFrequency());
   Object.keys(undoData.marksByMonth).forEach(key => {
     if(monthsData[key] && monthsData[key].habitMarks){
       monthsData[key].habitMarks.splice(undoData.index, 0, undoData.marksByMonth[key]);
@@ -1433,12 +1583,15 @@ function renderSleep(){
     tr.appendChild(labelTd);
 
     for(let d=0; d<n; d++){
-      const isFuture = todayDate !== -1 && (d+1) > todayDate;
+      const cellDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), d+1);
+      const todayOnly = new Date(REAL_TODAY.getFullYear(), REAL_TODAY.getMonth(), REAL_TODAY.getDate());
+      const diffDays = Math.round((todayOnly - cellDate) / 86400000);
+      const isEditable = diffDays === 0 || diffDays === 1;
       const td = document.createElement("td");
-      td.className = "cell" + (d+1 === todayDate ? " today" : "") + (isFuture ? " future" : "");
+      td.className = "cell" + (d+1 === todayDate ? " today" : "") + (!isEditable ? " future" : "");
       td.dataset.day = d;
       td.dataset.si = si;
-      if(!isFuture){
+      if(isEditable){
         td.addEventListener("click", () => {
           SLEEP_LABELS.forEach((_, oi) => { if(oi !== si) md.sleepMarks[oi][d] = false; });
           md.sleepMarks[si][d] = !md.sleepMarks[si][d];
@@ -1808,6 +1961,7 @@ document.getElementById("enableReminderBtn").addEventListener("click", async () 
 
 document.getElementById("addHabit").addEventListener("click", () => {
   habitLabels.push("New habit");
+  habitFrequency.push(defaultFrequency());
   renderHabits(); save();
 });
 document.querySelectorAll(".notes-box input").forEach(inp => {
@@ -1841,7 +1995,7 @@ function cacheKey(){ return "habit-cache-" + currentUid; }
 function saveLocalCache(updatedAt){
   try{
     localStorage.setItem(cacheKey(), JSON.stringify({
-      username: currentUsername, habitLabels, monthsData, theme, updatedAt
+      username: currentUsername, habitLabels, habitFrequency, monthsData, theme, updatedAt
     }));
   }catch(err){ /* localStorage unavailable, ignore */ }
 }
@@ -1857,7 +2011,7 @@ function save(){
       statusEl.textContent = "Saving...";
       await setDoc(doc(db, "users", currentUid), {
         username: currentUsername,
-        dataJSON: JSON.stringify({ habitLabels, monthsData, theme }),
+        dataJSON: JSON.stringify({ habitLabels, habitFrequency, monthsData, theme }),
         updatedAt
       });
       statusEl.textContent = "Saved";
@@ -1880,6 +2034,7 @@ async function loadFromFirestore(){
   // Show local data immediately if present, so there's no blank flash
   if(localData){
     if(localData.habitLabels) habitLabels = localData.habitLabels;
+    if(localData.habitFrequency) habitFrequency = localData.habitFrequency;
     if(localData.monthsData) monthsData = localData.monthsData;
     if(localData.theme) theme = localData.theme;
     applyTheme();
@@ -1907,6 +2062,7 @@ async function loadFromFirestore(){
   if(cloudReachable && cloudPayload && cloudTime >= localTime){
     // Cloud is newer or equal - trust it
     if(cloudPayload.habitLabels) habitLabels = cloudPayload.habitLabels;
+    if(cloudPayload.habitFrequency) habitFrequency = cloudPayload.habitFrequency;
     if(cloudPayload.monthsData) monthsData = cloudPayload.monthsData;
     if(cloudPayload.theme) theme = cloudPayload.theme;
     saveLocalCache(cloudTime);
@@ -1920,7 +2076,7 @@ async function loadFromFirestore(){
       try{
         await setDoc(doc(db, "users", currentUid), {
           username: currentUsername,
-          dataJSON: JSON.stringify({ habitLabels, monthsData, theme }),
+          dataJSON: JSON.stringify({ habitLabels, habitFrequency, monthsData, theme }),
           updatedAt: localTime
         });
       }catch(err){ /* will retry on next save */ }
@@ -1931,10 +2087,13 @@ async function loadFromFirestore(){
     statusEl.textContent = "Ready";
   }
 
+  if(habitFrequency.length !== habitLabels.length){
+    habitFrequency = habitLabels.map((_, i) => habitFrequency[i] || defaultFrequency());
+  }
+
   applyTheme();
   renderAll();
 }
 </script>
 </body>
 </html>
-
