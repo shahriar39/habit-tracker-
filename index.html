@@ -267,8 +267,15 @@
     border:1px solid var(--line);
     width:var(--day-col);
     min-width:var(--day-col);
-    height:26px;
+    height:38px;
     text-align:center;
+    line-height:1.3;
+  }
+  .day-th-weekday{
+    font-size:9px;
+    font-weight:600;
+    color:var(--muted);
+    text-transform:uppercase;
   }
   thead th.today{
     background:rgba(255,255,255,0.3);
@@ -621,18 +628,25 @@
     position:fixed;
     inset:0;
     background:
-      radial-gradient(ellipse at 12% 8%, rgba(129,92,255,0.62), transparent 34%),
-      radial-gradient(ellipse at 58% 14%, rgba(0,91,255,0.88), transparent 36%),
-      radial-gradient(ellipse at 82% 78%, rgba(94,60,255,0.62), transparent 34%),
-      linear-gradient(135deg, #020522 0%, #07117a 42%, #020529 100%);
+      radial-gradient(ellipse at 10% 8%, rgba(150,190,255,0.55), transparent 34%),
+      radial-gradient(ellipse at 56% 10%, rgba(120,175,255,0.5), transparent 36%),
+      radial-gradient(ellipse at 78% 70%, rgba(185,215,255,0.5), transparent 34%),
+      radial-gradient(ellipse at 18% 82%, rgba(150,195,255,0.45), transparent 38%),
+      linear-gradient(135deg, #eef5ff 0%, #dbe9ff 42%, #f5faff 100%);
     display:flex;
     align-items:center;
     justify-content:center;
     z-index:100;
     font-family:Arial, sans-serif;
+    padding:20px;
   }
   body.dark .auth-overlay{
-    background:linear-gradient(160deg, #04140f 0%, #0f3d34 45%, #145c4f 100%);
+    background:
+      radial-gradient(ellipse at 10% 8%, rgba(129,92,255,0.5), transparent 34%),
+      radial-gradient(ellipse at 56% 10%, rgba(0,91,255,0.82), transparent 36%),
+      radial-gradient(ellipse at 78% 70%, rgba(94,60,255,0.58), transparent 34%),
+      radial-gradient(ellipse at 18% 82%, rgba(44,110,255,0.58), transparent 38%),
+      linear-gradient(135deg, #01031a 0%, #070c55 42%, #010217 100%);
   }
   .auth-card{
     background:var(--surface);
@@ -720,6 +734,25 @@
     opacity:0.35;
     cursor:default;
     color:var(--muted);
+  }
+  tbody td.cell.paused-cell{
+    opacity:0.5;
+    cursor:default;
+    color:var(--muted);
+    font-size:9px;
+    letter-spacing:1px;
+  }
+  .paused-tag{
+    display:inline-block;
+    font-size:9px;
+    font-weight:700;
+    color:var(--muted);
+    background:var(--line);
+    padding:1px 6px;
+    border-radius:8px;
+    margin-left:6px;
+    vertical-align:middle;
+    text-transform:uppercase;
   }
   .auth-error{
     color:#c0392b;
@@ -880,6 +913,14 @@
     <input id="profileNewPassword" type="password" placeholder="New password (optional)" maxlength="100">
     <input id="profileCurrentPassword" type="password" placeholder="Current password (required)" autocomplete="current-password" maxlength="100">
     <button class="auth-submit" id="profileSubmit">Save changes</button>
+    <div style="border-top:1px solid var(--line);margin:18px 0 14px;"></div>
+    <label style="display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:6px;">Homepage card shows</label>
+    <select id="thoughtPreferenceSelect" style="width:100%;margin-bottom:4px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink-strong);font-family:Arial, sans-serif;font-size:13px;">
+      <option value="motivational">Motivational lines</option>
+      <option value="quotes">Quotes</option>
+      <option value="facts">Interesting facts</option>
+      <option value="surprise">Surprise me</option>
+    </select>
     <p class="auth-switch"><a id="profileCloseLink">Close</a></p>
   </div>
 </div>
@@ -900,6 +941,20 @@
     </div>
     <button class="auth-submit" id="frequencySave">Save frequency</button>
     <p class="auth-switch"><a id="frequencyClose">Close</a></p>
+  </div>
+</div>
+
+<div id="pauseOverlay" class="auth-overlay" style="display:none">
+  <div class="auth-card" style="width:290px">
+    <h2 style="font-size:22px">Pause Habit</h2>
+    <p style="font-size:12px;color:var(--muted);margin:-8px 0 14px;">Habit: <strong id="pauseHabitName" style="color:var(--ink)"></strong></p>
+    <label style="display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:6px;">From</label>
+    <input type="date" id="pauseFrom" style="width:100%;margin-bottom:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink-strong);font-family:Arial, sans-serif;font-size:13px;">
+    <label style="display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:6px;">To</label>
+    <input type="date" id="pauseTo" style="width:100%;margin-bottom:14px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink-strong);font-family:Arial, sans-serif;font-size:13px;">
+    <button class="auth-submit" id="pauseSave">Pause habit</button>
+    <button class="auth-submit" id="pauseResumeBtn" style="display:none;margin-top:8px;background:transparent;color:var(--ink);border:1px solid var(--line-strong);">Resume now</button>
+    <p class="auth-switch"><a id="pauseClose">Close</a></p>
   </div>
 </div>
 
@@ -946,18 +1001,25 @@
         <tbody id="habitsBody"></tbody>
       </table>
     </div>
-    <div class="overview-card" id="habitsOverviewCard" style="flex-shrink:0">
-      <div class="overview-title">Today's Habits Overview</div>
-      <div class="overview-body">
-        <svg id="overviewRing" viewBox="0 0 120 120" width="90" height="90">
-          <circle cx="60" cy="60" r="50" style="fill:none;stroke:var(--line);stroke-width:12"></circle>
-          <circle id="overviewArc" cx="60" cy="60" r="50" style="fill:none;stroke:var(--ink);stroke-width:12" stroke-linecap="round" transform="rotate(-90 60 60)"></circle>
-          <text id="overviewPercentText" x="60" y="66" text-anchor="middle" style="font-family:Arial, sans-serif;font-size:22px;font-weight:700;fill:var(--ink-strong)">0%</text>
-        </svg>
-        <div class="overview-stats">
-          <div><span id="overviewTotal">0</span><label>Total</label></div>
-          <div><span id="overviewCompleted">0</span><label>Completed</label></div>
+    <div style="display:flex;flex-direction:column;gap:16px;flex-shrink:0">
+      <div class="overview-card" id="habitsOverviewCard">
+        <div class="overview-title">Today's Habits Overview</div>
+        <div class="overview-body">
+          <svg id="overviewRing" viewBox="0 0 120 120" width="90" height="90">
+            <circle cx="60" cy="60" r="50" style="fill:none;stroke:var(--line);stroke-width:12"></circle>
+            <circle id="overviewArc" cx="60" cy="60" r="50" style="fill:none;stroke:var(--ink);stroke-width:12" stroke-linecap="round" transform="rotate(-90 60 60)"></circle>
+            <text id="overviewPercentText" x="60" y="66" text-anchor="middle" style="font-family:Arial, sans-serif;font-size:22px;font-weight:700;fill:var(--ink-strong)">0%</text>
+          </svg>
+          <div class="overview-stats">
+            <div><span id="overviewTotal">0</span><label>Total</label></div>
+            <div><span id="overviewCompleted">0</span><label>Completed</label></div>
+          </div>
         </div>
+      </div>
+      <div class="overview-card" id="thoughtCard">
+        <div class="overview-title" id="thoughtCardTitle">Today's Thought</div>
+        <p id="thoughtCardText" style="font-size:14px;line-height:1.5;margin:0 0 10px;color:var(--ink-strong)"></p>
+        <p id="thoughtCardAttribution" style="font-size:11px;color:var(--muted);margin:0;font-style:italic"></p>
       </div>
     </div>
   </div>
@@ -1153,10 +1215,16 @@ document.getElementById("profileBtn").addEventListener("click", () => {
   document.getElementById("profileError").textContent = "";
   document.getElementById("profileSuccess").textContent = "";
   document.getElementById("profileUsernameDisplay").textContent = currentUsername;
+  document.getElementById("thoughtPreferenceSelect").value = thoughtPreference;
   document.getElementById("profileOverlay").style.display = "flex";
 });
 document.getElementById("profileCloseLink").addEventListener("click", () => {
   document.getElementById("profileOverlay").style.display = "none";
+});
+document.getElementById("thoughtPreferenceSelect").addEventListener("change", e => {
+  thoughtPreference = e.target.value;
+  renderThoughtCard();
+  save();
 });
 
 let currentFrequencyHi = null;
@@ -1203,6 +1271,39 @@ document.getElementById("frequencySave").addEventListener("click", () => {
   }
   habitFrequency[currentFrequencyHi] = newFreq;
   document.getElementById("frequencyOverlay").style.display = "none";
+  renderHabits();
+  save();
+});
+
+let currentPauseHi = null;
+function openPauseModal(hi){
+  currentPauseHi = hi;
+  document.getElementById("pauseHabitName").textContent = habitLabels[hi];
+  const existing = habitPaused[hi];
+  const todayStr = dateToStr(REAL_TODAY);
+  document.getElementById("pauseFrom").value = (existing && existing.from) || todayStr;
+  const weekAhead = new Date(REAL_TODAY); weekAhead.setDate(weekAhead.getDate() + 7);
+  document.getElementById("pauseTo").value = (existing && existing.to) || dateToStr(weekAhead);
+  document.getElementById("pauseResumeBtn").style.display = isHabitPaused(hi, REAL_TODAY) ? "block" : "none";
+  document.getElementById("pauseOverlay").style.display = "flex";
+}
+document.getElementById("pauseClose").addEventListener("click", () => {
+  document.getElementById("pauseOverlay").style.display = "none";
+});
+document.getElementById("pauseSave").addEventListener("click", () => {
+  if(currentPauseHi === null) return;
+  const from = document.getElementById("pauseFrom").value;
+  const to = document.getElementById("pauseTo").value;
+  if(!from || !to || to < from) return;
+  habitPaused[currentPauseHi] = { from, to };
+  document.getElementById("pauseOverlay").style.display = "none";
+  renderHabits();
+  save();
+});
+document.getElementById("pauseResumeBtn").addEventListener("click", () => {
+  if(currentPauseHi === null) return;
+  habitPaused[currentPauseHi] = null;
+  document.getElementById("pauseOverlay").style.display = "none";
   renderHabits();
   save();
 });
@@ -1312,6 +1413,7 @@ const SLEEP_VALUES = [9,8,7,6,5];
 
 let habitLabels = ["Diet","Water","Workout 1","Workout 2","Book","Study"];
 let habitFrequency = habitLabels.map(() => ({ type: "daily" }));
+let habitPaused = habitLabels.map(() => null);
 function defaultFrequency(){ return { type: "daily" }; }
 function isHabitScheduled(hi, dateObj){
   const freq = habitFrequency[hi] || defaultFrequency();
@@ -1320,6 +1422,16 @@ function isHabitScheduled(hi, dateObj){
   if(freq.type === "weekdays") return dow >= 1 && dow <= 5;
   if(freq.type === "custom") return (freq.days || []).includes(dow);
   return true;
+}
+function dateToStr(d){ return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function isHabitPaused(hi, dateObj){
+  const p = habitPaused[hi];
+  if(!p || !p.from || !p.to) return false;
+  const s = dateToStr(dateObj);
+  return s >= p.from && s <= p.to;
+}
+function isHabitRequired(hi, dateObj){
+  return isHabitScheduled(hi, dateObj) && !isHabitPaused(hi, dateObj);
 }
 function frequencyLabel(freq){
   if(!freq || freq.type === "daily") return "Daily";
@@ -1331,6 +1443,7 @@ function frequencyLabel(freq){
   return "Daily";
 }
 let theme = "light";
+let thoughtPreference = "motivational";
 let monthsData = {}; // keyed by "YYYY-M" -> { habitMarks:[[...]], sleepMarks:[[...]], notes:["",""] }
 let viewDate = new Date(REAL_TODAY.getFullYear(), REAL_TODAY.getMonth(), 1);
 
@@ -1353,12 +1466,15 @@ function getMonthData(d){
   return md;
 }
 
+const WEEKDAY_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 function buildHead(rowId, count, todayDate){
   const row = document.getElementById(rowId);
   row.querySelectorAll("th.day-th").forEach(th => th.remove());
   for(let d=1; d<=count; d++){
     const th = document.createElement("th");
-    th.textContent = d;
+    const dateObj = new Date(viewDate.getFullYear(), viewDate.getMonth(), d);
+    const wd = WEEKDAY_SHORT[dateObj.getDay()];
+    th.innerHTML = '<div class="day-th-weekday">' + wd + '</div><div>' + d + '</div>';
     th.className = "day-th";
     if(d === todayDate) th.classList.add("today");
     row.appendChild(th);
@@ -1402,6 +1518,20 @@ function renderHabits(){
       e.preventDefault();
       showContextMenu(e.clientX, e.clientY, hi);
     });
+    let longPressTimer = null;
+    let longPressFired = false;
+    tr.addEventListener("touchstart", e => {
+      longPressFired = false;
+      const touch = e.touches[0];
+      longPressTimer = setTimeout(() => {
+        longPressFired = true;
+        if(navigator.vibrate) navigator.vibrate(20);
+        showContextMenu(touch.clientX, touch.clientY, hi);
+      }, 500);
+    }, { passive: true });
+    tr.addEventListener("touchend", () => { clearTimeout(longPressTimer); });
+    tr.addEventListener("touchmove", () => { clearTimeout(longPressTimer); });
+    tr.addEventListener("touchcancel", () => { clearTimeout(longPressTimer); });
 
     const labelTd = document.createElement("td");
     labelTd.className = "label-cell";
@@ -1410,15 +1540,24 @@ function renderHabits(){
     input.maxLength = 40;
     input.addEventListener("input", e => { habitLabels[hi] = e.target.value.slice(0, 40); save(); });
     labelTd.appendChild(input);
+    if(isHabitPaused(hi, REAL_TODAY)){
+      const tag = document.createElement("span");
+      tag.className = "paused-tag";
+      tag.textContent = "paused";
+      labelTd.appendChild(tag);
+    }
     tr.appendChild(labelTd);
 
     for(let d=0; d<n; d++){
       const isFuture = todayDate !== -1 && (d+1) > todayDate;
       const cellDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), d+1);
       const scheduled = isHabitScheduled(hi, cellDate);
+      const paused = scheduled && isHabitPaused(hi, cellDate);
       const td = document.createElement("td");
-      td.className = "cell" + (d+1 === todayDate ? " today" : "") + (isFuture ? " future" : "") + (!scheduled ? " unscheduled" : "");
-      if(!scheduled){
+      td.className = "cell" + (d+1 === todayDate ? " today" : "") + (isFuture ? " future" : "") + (!scheduled ? " unscheduled" : "") + (paused ? " paused-cell" : "");
+      if(paused){
+        td.textContent = "II";
+      } else if(!scheduled){
         td.textContent = "-";
       } else {
         td.textContent = md.habitMarks[hi][d] ? "\u2713" : "";
@@ -1426,7 +1565,10 @@ function renderHabits(){
           td.addEventListener("click", () => {
             md.habitMarks[hi][d] = !md.habitMarks[hi][d];
             td.textContent = md.habitMarks[hi][d] ? "\u2713" : "";
-            if(md.habitMarks[hi][d]) recordCheckinIfToday(d);
+            if(md.habitMarks[hi][d]){
+              recordCheckinIfToday(d);
+              playCheckFeedback();
+            }
             save();
             renderHabitsOverview();
           });
@@ -1445,7 +1587,7 @@ function renderHabitsOverview(){
   let total = 0;
   let completed = 0;
   for(let hi = 0; hi < habitLabels.length; hi++){
-    if(!isHabitScheduled(hi, REAL_TODAY)) continue;
+    if(!isHabitRequired(hi, REAL_TODAY)) continue;
     total++;
     if(todayMd.habitMarks[hi] && todayMd.habitMarks[hi][todayIndex]) completed++;
   }
@@ -1467,6 +1609,8 @@ function reorderHabit(fromIndex, toIndex){
   habitLabels.splice(toIndex, 0, movedLabel);
   const [movedFreq] = habitFrequency.splice(fromIndex, 1);
   habitFrequency.splice(toIndex, 0, movedFreq || defaultFrequency());
+  const [movedPaused] = habitPaused.splice(fromIndex, 1);
+  habitPaused.splice(toIndex, 0, movedPaused || null);
   Object.values(monthsData).forEach(md => {
     if(md.habitMarks && md.habitMarks[fromIndex]){
       const [movedMarks] = md.habitMarks.splice(fromIndex, 1);
@@ -1494,6 +1638,13 @@ function showContextMenu(x, y, hi){
     openFrequencyModal(hi);
     closeContextMenu();
   });
+  const pauseBtn = document.createElement("button");
+  pauseBtn.textContent = isHabitPaused(hi, REAL_TODAY) ? "Manage pause" : "Pause habit";
+  pauseBtn.style.color = "var(--ink)";
+  pauseBtn.addEventListener("click", () => {
+    openPauseModal(hi);
+    closeContextMenu();
+  });
   const delBtn = document.createElement("button");
   delBtn.textContent = "Delete habit";
   delBtn.addEventListener("click", () => {
@@ -1501,6 +1652,7 @@ function showContextMenu(x, y, hi){
     closeContextMenu();
   });
   menu.appendChild(freqBtn);
+  menu.appendChild(pauseBtn);
   menu.appendChild(delBtn);
   document.body.appendChild(menu);
   contextMenuEl = menu;
@@ -1514,6 +1666,7 @@ function deleteHabit(hi){
     index: hi,
     label: habitLabels[hi],
     frequency: habitFrequency[hi],
+    paused: habitPaused[hi],
     marksByMonth: {}
   };
   Object.keys(monthsData).forEach(key => {
@@ -1525,6 +1678,7 @@ function deleteHabit(hi){
 
   habitLabels.splice(hi, 1);
   habitFrequency.splice(hi, 1);
+  habitPaused.splice(hi, 1);
   Object.values(monthsData).forEach(md => {
     if(md.habitMarks) md.habitMarks.splice(hi, 1);
   });
@@ -1557,6 +1711,7 @@ function undoDelete(){
   if(!undoData) return;
   habitLabels.splice(undoData.index, 0, undoData.label);
   habitFrequency.splice(undoData.index, 0, undoData.frequency || defaultFrequency());
+  habitPaused.splice(undoData.index, 0, undoData.paused || null);
   Object.keys(undoData.marksByMonth).forEach(key => {
     if(monthsData[key] && monthsData[key].habitMarks){
       monthsData[key].habitMarks.splice(undoData.index, 0, undoData.marksByMonth[key]);
@@ -1682,12 +1837,73 @@ function renderNotes(){
   });
 }
 
+const MOTIVATIONAL_LINES = [
+  "Small steps, repeated daily, add up to something big.",
+  "You don't have to be perfect today — just consistent.",
+  "Progress isn't always visible day to day, but it's always adding up.",
+  "The habit you almost skipped is often the one that matters most.",
+  "Discipline is just choosing what you want most over what you want now.",
+  "Every checkmark today is a vote for the person you're becoming.",
+  "Showing up imperfectly still counts. Don't let perfect stop you.",
+  "You won't feel like it every day. Do it anyway.",
+  "Consistency beats intensity in the long run.",
+  "One good day doesn't make a habit. Neither does one bad day break it."
+];
+const QUOTE_LINES = [
+  { text: "If you want to go fast, go alone. If you want to go far, go together.", source: "African proverb" },
+  { text: "The man who moves a mountain begins by carrying away small stones.", source: "Confucius, paraphrased" },
+  { text: "Existence precedes essence — you become who you are through your choices.", source: "Existentialist idea" },
+  { text: "A journey of a thousand miles begins with a single step.", source: "Ancient proverb" },
+  { text: "Fall down seven times, stand up eight.", source: "Japanese proverb" },
+  { text: "Well begun is half done.", source: "Ancient proverb" },
+  { text: "The best time to plant a tree was twenty years ago. The second best time is now.", source: "Common proverb" },
+  { text: "What you do every day matters more than what you do once in a while.", source: "Common wisdom" }
+];
+const FACT_LINES = [
+  { text: "The human eye can process the equivalent of about 576 megapixels of detail.", source: "Human body" },
+  { text: "It takes your brain roughly a tenth of a second to visually recognize something.", source: "Human body" },
+  { text: "Fidgeting throughout the day can burn up to 350 extra calories.", source: "Human body" },
+  { text: "Humans can distinguish over a trillion different scents.", source: "Human body" },
+  { text: "Most people experience 4 to 6 dreams a night, even if they don't remember them.", source: "Human body" },
+  { text: "Our galaxy is home to an estimated 400 billion stars.", source: "Space" },
+  { text: "The Moon drifts about 4 centimeters farther from Earth every year.", source: "Space" },
+  { text: "A day on Venus is longer than its entire year.", source: "Space" },
+  { text: "Male penguins often court a mate by offering her a smooth pebble.", source: "Animals" },
+  { text: "An octopus has three hearts.", source: "Animals" },
+  { text: "Scientists estimate there are around 8.7 million species on Earth.", source: "Animals" }
+];
+
+function pickThoughtOfDay(){
+  const dayOfYear = Math.floor((REAL_TODAY - new Date(REAL_TODAY.getFullYear(), 0, 0)) / 86400000);
+  let pref = thoughtPreference;
+  if(pref === "surprise"){
+    const pool = ["motivational", "quotes", "facts"];
+    pref = pool[dayOfYear % pool.length];
+  }
+  if(pref === "quotes"){
+    const q = QUOTE_LINES[dayOfYear % QUOTE_LINES.length];
+    return { title: "Today's Quote", text: q.text, source: q.source };
+  }
+  if(pref === "facts"){
+    const f = FACT_LINES[dayOfYear % FACT_LINES.length];
+    return { title: "Did You Know?", text: f.text, source: f.source };
+  }
+  return { title: "Today's Thought", text: MOTIVATIONAL_LINES[dayOfYear % MOTIVATIONAL_LINES.length], source: "Motivation" };
+}
+function renderThoughtCard(){
+  const thought = pickThoughtOfDay();
+  document.getElementById("thoughtCardTitle").textContent = thought.title;
+  document.getElementById("thoughtCardText").textContent = thought.text;
+  document.getElementById("thoughtCardAttribution").textContent = "— " + thought.source;
+}
+
 function renderAll(){
   renderMonthLabel();
   renderHabits();
   renderSleep();
   renderNotes();
   renderGreeting();
+  renderThoughtCard();
   checkReportBanner();
 }
 
@@ -1740,13 +1956,24 @@ function computeStreaks(hi){
   const end = new Date(REAL_TODAY.getFullYear(), REAL_TODAY.getMonth(), REAL_TODAY.getDate());
   let longest = 0, running = 0;
   while(cursor <= end){
-    if(isHabitDoneOnDate(hi, cursor)){ running++; if(running > longest) longest = running; }
-    else { running = 0; }
+    if(!isHabitRequired(hi, cursor)){
+      // not scheduled or paused that day — doesn't break or extend the streak
+    } else if(isHabitDoneOnDate(hi, cursor)){
+      running++; if(running > longest) longest = running;
+    } else {
+      running = 0;
+    }
     cursor.setDate(cursor.getDate() + 1);
   }
   let current = 0;
   let d = new Date(end);
-  while(isHabitDoneOnDate(hi, d)){ current++; d.setDate(d.getDate() - 1); }
+  const earliestDate = new Date(ey, em - 1, 1);
+  while(d >= earliestDate){
+    if(!isHabitRequired(hi, d)){ d.setDate(d.getDate() - 1); continue; }
+    if(!isHabitDoneOnDate(hi, d)) break;
+    current++;
+    d.setDate(d.getDate() - 1);
+  }
   return { current, longest };
 }
 function renderBadgeShelf(){
@@ -1894,6 +2121,28 @@ let checkinTimes = [];
 let remindersEnabled = false;
 let reminderInterval = null;
 let lastReminderDateStr = null;
+let feedbackAudioCtx = null;
+
+function playCheckFeedback(){
+  try{
+    if(!feedbackAudioCtx) feedbackAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = feedbackAudioCtx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(660, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(990, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.16);
+  }catch(e){ /* audio unavailable, ignore */ }
+  try{
+    if(navigator.vibrate) navigator.vibrate(15);
+  }catch(e){ /* vibration unavailable, ignore */ }
+}
 
 function recordCheckinIfToday(dayIndex){
   if(dayIndex !== REAL_TODAY.getDate() - 1) return;
@@ -1962,6 +2211,7 @@ document.getElementById("enableReminderBtn").addEventListener("click", async () 
 document.getElementById("addHabit").addEventListener("click", () => {
   habitLabels.push("New habit");
   habitFrequency.push(defaultFrequency());
+  habitPaused.push(null);
   renderHabits(); save();
 });
 document.querySelectorAll(".notes-box input").forEach(inp => {
@@ -1995,7 +2245,7 @@ function cacheKey(){ return "habit-cache-" + currentUid; }
 function saveLocalCache(updatedAt){
   try{
     localStorage.setItem(cacheKey(), JSON.stringify({
-      username: currentUsername, habitLabels, habitFrequency, monthsData, theme, updatedAt
+      username: currentUsername, habitLabels, habitFrequency, habitPaused, monthsData, theme, thoughtPreference, updatedAt
     }));
   }catch(err){ /* localStorage unavailable, ignore */ }
 }
@@ -2011,7 +2261,7 @@ function save(){
       statusEl.textContent = "Saving...";
       await setDoc(doc(db, "users", currentUid), {
         username: currentUsername,
-        dataJSON: JSON.stringify({ habitLabels, habitFrequency, monthsData, theme }),
+        dataJSON: JSON.stringify({ habitLabels, habitFrequency, habitPaused, monthsData, theme, thoughtPreference }),
         updatedAt
       });
       statusEl.textContent = "Saved";
@@ -2035,8 +2285,10 @@ async function loadFromFirestore(){
   if(localData){
     if(localData.habitLabels) habitLabels = localData.habitLabels;
     if(localData.habitFrequency) habitFrequency = localData.habitFrequency;
+    if(localData.habitPaused) habitPaused = localData.habitPaused;
     if(localData.monthsData) monthsData = localData.monthsData;
     if(localData.theme) theme = localData.theme;
+    if(localData.thoughtPreference) thoughtPreference = localData.thoughtPreference;
     applyTheme();
     renderAll();
   }
@@ -2063,8 +2315,10 @@ async function loadFromFirestore(){
     // Cloud is newer or equal - trust it
     if(cloudPayload.habitLabels) habitLabels = cloudPayload.habitLabels;
     if(cloudPayload.habitFrequency) habitFrequency = cloudPayload.habitFrequency;
+    if(cloudPayload.habitPaused) habitPaused = cloudPayload.habitPaused;
     if(cloudPayload.monthsData) monthsData = cloudPayload.monthsData;
     if(cloudPayload.theme) theme = cloudPayload.theme;
+    if(cloudPayload.thoughtPreference) thoughtPreference = cloudPayload.thoughtPreference;
     saveLocalCache(cloudTime);
     statusEl.textContent = "Ready";
   } else if(localData && localTime > cloudTime){
@@ -2076,7 +2330,7 @@ async function loadFromFirestore(){
       try{
         await setDoc(doc(db, "users", currentUid), {
           username: currentUsername,
-          dataJSON: JSON.stringify({ habitLabels, habitFrequency, monthsData, theme }),
+          dataJSON: JSON.stringify({ habitLabels, habitFrequency, habitPaused, monthsData, theme, thoughtPreference }),
           updatedAt: localTime
         });
       }catch(err){ /* will retry on next save */ }
