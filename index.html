@@ -934,10 +934,16 @@
       <option value="daily">Every day</option>
       <option value="weekdays">Weekdays (Mon-Fri)</option>
       <option value="custom">Custom days</option>
+      <option value="weekly-count">X times a week (any days)</option>
     </select>
     <div id="frequencyCustomDays" style="display:none;margin-bottom:14px;">
       <label style="display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:8px;">Custom days</label>
       <div class="day-chip-row" id="dayChipRow"></div>
+    </div>
+    <div id="frequencyWeeklyCount" style="display:none;margin-bottom:14px;">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:8px;">Times per week</label>
+      <input type="number" id="weeklyCountInput" min="1" max="7" value="4" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink-strong);font-family:Arial, sans-serif;font-size:13px;">
+      <p style="font-size:11px;color:var(--muted);margin:8px 0 0;">Every day stays clickable — we'll track how many times you've done it this week against this target, not which specific days.</p>
     </div>
     <button class="auth-submit" id="frequencySave">Save frequency</button>
     <p class="auth-switch"><a id="frequencyClose">Close</a></p>
@@ -1001,25 +1007,18 @@
         <tbody id="habitsBody"></tbody>
       </table>
     </div>
-    <div style="display:flex;flex-direction:column;gap:16px;flex-shrink:0">
-      <div class="overview-card" id="habitsOverviewCard">
-        <div class="overview-title">Today's Habits Overview</div>
-        <div class="overview-body">
-          <svg id="overviewRing" viewBox="0 0 120 120" width="90" height="90">
-            <circle cx="60" cy="60" r="50" style="fill:none;stroke:var(--line);stroke-width:12"></circle>
-            <circle id="overviewArc" cx="60" cy="60" r="50" style="fill:none;stroke:var(--ink);stroke-width:12" stroke-linecap="round" transform="rotate(-90 60 60)"></circle>
-            <text id="overviewPercentText" x="60" y="66" text-anchor="middle" style="font-family:Arial, sans-serif;font-size:22px;font-weight:700;fill:var(--ink-strong)">0%</text>
-          </svg>
-          <div class="overview-stats">
-            <div><span id="overviewTotal">0</span><label>Total</label></div>
-            <div><span id="overviewCompleted">0</span><label>Completed</label></div>
-          </div>
+    <div class="overview-card" id="habitsOverviewCard" style="flex-shrink:0">
+      <div class="overview-title">Today's Habits Overview</div>
+      <div class="overview-body">
+        <svg id="overviewRing" viewBox="0 0 120 120" width="90" height="90">
+          <circle cx="60" cy="60" r="50" style="fill:none;stroke:var(--line);stroke-width:12"></circle>
+          <circle id="overviewArc" cx="60" cy="60" r="50" style="fill:none;stroke:var(--ink);stroke-width:12" stroke-linecap="round" transform="rotate(-90 60 60)"></circle>
+          <text id="overviewPercentText" x="60" y="66" text-anchor="middle" style="font-family:Arial, sans-serif;font-size:22px;font-weight:700;fill:var(--ink-strong)">0%</text>
+        </svg>
+        <div class="overview-stats">
+          <div><span id="overviewTotal">0</span><label>Total</label></div>
+          <div><span id="overviewCompleted">0</span><label>Completed</label></div>
         </div>
-      </div>
-      <div class="overview-card" id="thoughtCard">
-        <div class="overview-title" id="thoughtCardTitle">Today's Thought</div>
-        <p id="thoughtCardText" style="font-size:14px;line-height:1.5;margin:0 0 10px;color:var(--ink-strong)"></p>
-        <p id="thoughtCardAttribution" style="font-size:11px;color:var(--muted);margin:0;font-style:italic"></p>
       </div>
     </div>
   </div>
@@ -1027,12 +1026,19 @@
     <button class="btn" id="addHabit">+ Add habit</button>
   </div>
 
-  <div class="grid-wrap" id="sleepGridWrap" style="position:relative">
-    <table id="sleepTable">
-      <thead><tr id="sleepHead"><th class="label-col section-label">SLEEP</th></tr></thead>
-      <tbody id="sleepBody"></tbody>
-    </table>
-    <svg id="sleepOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible"></svg>
+  <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:8px">
+    <div class="grid-wrap" id="sleepGridWrap" style="position:relative;flex:1;margin-bottom:0">
+      <table id="sleepTable">
+        <thead><tr id="sleepHead"><th class="label-col section-label">SLEEP</th></tr></thead>
+        <tbody id="sleepBody"></tbody>
+      </table>
+      <svg id="sleepOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible"></svg>
+    </div>
+    <div class="overview-card" id="thoughtCard" style="flex-shrink:0">
+      <div class="overview-title" id="thoughtCardTitle">Today's Thought</div>
+      <p id="thoughtCardText" style="font-size:14px;line-height:1.5;margin:0 0 10px;color:var(--ink-strong)"></p>
+      <p id="thoughtCardAttribution" style="font-size:11px;color:var(--muted);margin:0;font-style:italic"></p>
+    </div>
   </div>
   <div class="sleep-summary" id="sleepSummary">Average sleep this month: -</div>
 
@@ -1251,10 +1257,13 @@ function openFrequencyModal(hi){
     chipRow.appendChild(chip);
   });
   document.getElementById("frequencyCustomDays").style.display = freq.type === "custom" ? "block" : "none";
+  document.getElementById("frequencyWeeklyCount").style.display = freq.type === "weekly-count" ? "block" : "none";
+  document.getElementById("weeklyCountInput").value = freq.type === "weekly-count" ? (freq.target || 4) : 4;
   document.getElementById("frequencyOverlay").style.display = "flex";
 }
 document.getElementById("frequencyType").addEventListener("change", e => {
   document.getElementById("frequencyCustomDays").style.display = e.target.value === "custom" ? "block" : "none";
+  document.getElementById("frequencyWeeklyCount").style.display = e.target.value === "weekly-count" ? "block" : "none";
 });
 document.getElementById("frequencyClose").addEventListener("click", () => {
   document.getElementById("frequencyOverlay").style.display = "none";
@@ -1266,6 +1275,11 @@ document.getElementById("frequencySave").addEventListener("click", () => {
   if(type === "custom"){
     const days = Array.from(document.querySelectorAll("#dayChipRow .day-chip.active")).map(c => +c.dataset.dow);
     newFreq = { type: "custom", days };
+  } else if(type === "weekly-count"){
+    let target = parseInt(document.getElementById("weeklyCountInput").value, 10);
+    if(!target || target < 1) target = 1;
+    if(target > 7) target = 7;
+    newFreq = { type: "weekly-count", target };
   } else {
     newFreq = { type };
   }
@@ -1440,7 +1454,26 @@ function frequencyLabel(freq){
     const names = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     return (freq.days || []).slice().sort().map(d => names[d]).join(", ") || "Custom";
   }
+  if(freq.type === "weekly-count") return (freq.target || 4) + "x / week";
   return "Daily";
+}
+function getWeekStart(dateObj){
+  const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+  const day = d.getDay();
+  const diff = (day === 0 ? -6 : 1) - day; // Monday-start week
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+function computeWeeklyCount(hi, refDate){
+  const start = getWeekStart(refDate);
+  let count = 0;
+  for(let i = 0; i < 7; i++){
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    if(d > refDate) break;
+    if(isHabitDoneOnDate(hi, d)) count++;
+  }
+  return count;
 }
 let theme = "light";
 let thoughtPreference = "motivational";
@@ -1544,6 +1577,13 @@ function renderHabits(){
       const tag = document.createElement("span");
       tag.className = "paused-tag";
       tag.textContent = "paused";
+      labelTd.appendChild(tag);
+    } else if(habitFrequency[hi] && habitFrequency[hi].type === "weekly-count"){
+      const done = computeWeeklyCount(hi, REAL_TODAY);
+      const target = habitFrequency[hi].target || 4;
+      const tag = document.createElement("span");
+      tag.className = "paused-tag";
+      tag.textContent = done + "/" + target + " this wk";
       labelTd.appendChild(tag);
     }
     tr.appendChild(labelTd);
@@ -1873,22 +1913,28 @@ const FACT_LINES = [
   { text: "Scientists estimate there are around 8.7 million species on Earth.", source: "Animals" }
 ];
 
+function getContentDayKey(){
+  const now = new Date();
+  const shifted = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if(now.getHours() < 6) shifted.setDate(shifted.getDate() - 1);
+  return Math.floor((shifted - new Date(shifted.getFullYear(), 0, 0)) / 86400000);
+}
 function pickThoughtOfDay(){
-  const dayOfYear = Math.floor((REAL_TODAY - new Date(REAL_TODAY.getFullYear(), 0, 0)) / 86400000);
+  const dayKey = getContentDayKey();
   let pref = thoughtPreference;
   if(pref === "surprise"){
     const pool = ["motivational", "quotes", "facts"];
-    pref = pool[dayOfYear % pool.length];
+    pref = pool[dayKey % pool.length];
   }
   if(pref === "quotes"){
-    const q = QUOTE_LINES[dayOfYear % QUOTE_LINES.length];
+    const q = QUOTE_LINES[dayKey % QUOTE_LINES.length];
     return { title: "Today's Quote", text: q.text, source: q.source };
   }
   if(pref === "facts"){
-    const f = FACT_LINES[dayOfYear % FACT_LINES.length];
+    const f = FACT_LINES[dayKey % FACT_LINES.length];
     return { title: "Did You Know?", text: f.text, source: f.source };
   }
-  return { title: "Today's Thought", text: MOTIVATIONAL_LINES[dayOfYear % MOTIVATIONAL_LINES.length], source: "Motivation" };
+  return { title: "Today's Thought", text: MOTIVATIONAL_LINES[dayKey % MOTIVATIONAL_LINES.length], source: "Motivation" };
 }
 function renderThoughtCard(){
   const thought = pickThoughtOfDay();
@@ -1896,6 +1942,14 @@ function renderThoughtCard(){
   document.getElementById("thoughtCardText").textContent = thought.text;
   document.getElementById("thoughtCardAttribution").textContent = "— " + thought.source;
 }
+let lastThoughtDayKey = getContentDayKey();
+setInterval(() => {
+  const key = getContentDayKey();
+  if(key !== lastThoughtDayKey){
+    lastThoughtDayKey = key;
+    renderThoughtCard();
+  }
+}, 5 * 60 * 1000);
 
 function renderAll(){
   renderMonthLabel();
