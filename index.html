@@ -301,12 +301,18 @@
     font-weight:700;
     color:var(--ink-strong);
     text-align:right;
-    padding:0 14px 0 6px;
+    padding:4px 14px 4px 6px;
     letter-spacing:.03em;
     white-space:nowrap;
     width:var(--label-col);
     min-width:var(--label-col);
     max-width:var(--label-col);
+  }
+  tbody td.label-cell > div{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:2px;
   }
   tbody td.label-cell input{
     border:none;
@@ -366,17 +372,19 @@
   .btn:active{ transform:scale(0.97); }
   .sleep-summary{
     font-family:Arial, sans-serif;
-    font-size:12px;
+    font-size:15px;
+    font-weight:600;
     color:var(--ink);
-    margin-top:8px;
+    margin-top:10px;
   }
   .overview-card{
     border:1px solid var(--line);
     border-radius:14px;
-    padding:16px 20px;
+    padding:18px 22px;
     background:var(--surface);
     font-family:Arial, sans-serif;
-    min-width:230px;
+    min-width:260px;
+    width:260px;
     box-shadow:var(--glass-shadow);
     border-color:var(--glass-border);
     backdrop-filter:blur(24px) saturate(170%);
@@ -750,8 +758,7 @@
     background:var(--line);
     padding:1px 6px;
     border-radius:8px;
-    margin-left:6px;
-    vertical-align:middle;
+    margin-top:2px;
     text-transform:uppercase;
   }
   .auth-error{
@@ -898,8 +905,48 @@
     <input id="authUsername" placeholder="Username" autocomplete="username" maxlength="30">
     <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" maxlength="100">
     <p style="font-size:11px;color:var(--muted);margin:-4px 0 10px;">Username: 3+ characters. Password: 6+ characters with letters and numbers.</p>
+    <div id="signupSecurityQuestions" style="display:none">
+      <p style="font-size:11px;font-weight:700;color:var(--ink);margin:8px 0 6px;">Security question 1</p>
+      <select id="signupQ1" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink-strong);font-family:Arial, sans-serif;font-size:13px;"></select>
+      <input id="signupA1" placeholder="Your answer" maxlength="60" style="margin-bottom:12px;">
+      <p style="font-size:11px;font-weight:700;color:var(--ink);margin:0 0 6px;">Security question 2</p>
+      <select id="signupQ2" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink-strong);font-family:Arial, sans-serif;font-size:13px;"></select>
+      <input id="signupA2" placeholder="Your answer" maxlength="60" style="margin-bottom:6px;">
+      <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">Used only to verify it's you if you ever forget your password.</p>
+    </div>
     <button class="auth-submit" id="authSubmit">Log in</button>
     <p class="auth-switch">Don't have an account? <a id="authSwitchLink">Sign up</a></p>
+    <p class="auth-switch" id="forgotPasswordRow"><a id="forgotPasswordLink">Forgot password?</a></p>
+    <div style="display:flex;justify-content:center;gap:14px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);">
+      <a href="https://www.instagram.com/niloy.39/" target="_blank" rel="noopener" style="font-size:11px;color:var(--muted);text-decoration:none;">Instagram</a>
+      <a href="https://x.com/niloy_39" target="_blank" rel="noopener" style="font-size:11px;color:var(--muted);text-decoration:none;">X</a>
+    </div>
+  </div>
+</div>
+
+<div id="forgotOverlay" class="auth-overlay" style="display:none">
+  <div class="auth-card">
+    <h2 style="font-size:24px">Forgot Password</h2>
+    <div class="auth-error" id="forgotError"></div>
+    <div id="forgotStep1">
+      <input id="forgotUsername" placeholder="Your username" maxlength="30">
+      <button class="auth-submit" id="forgotFindBtn">Continue</button>
+    </div>
+    <div id="forgotStep2" style="display:none">
+      <p id="forgotQ1Text" style="font-size:12px;font-weight:700;color:var(--ink);margin:8px 0 6px;"></p>
+      <input id="forgotA1" placeholder="Your answer" maxlength="60">
+      <p id="forgotQ2Text" style="font-size:12px;font-weight:700;color:var(--ink);margin:8px 0 6px;"></p>
+      <input id="forgotA2" placeholder="Your answer" maxlength="60">
+      <button class="auth-submit" id="forgotVerifyBtn">Verify</button>
+    </div>
+    <div id="forgotStep3" style="display:none">
+      <div style="background:rgba(46,125,50,0.12);border:1px solid rgba(46,125,50,0.4);border-radius:8px;padding:12px;margin-bottom:6px;">
+        <p style="font-size:13px;color:#2e7d32;margin:0;font-weight:700;">Identity verified ✓</p>
+        <p style="font-size:12px;color:var(--muted);margin:8px 0 0;line-height:1.5;">Since this app doesn't use email, the last step needs to be finished by the site owner directly in Firebase (the same way we recover any account manually). Send them this info:</p>
+        <p style="font-size:12px;margin:8px 0 0;font-family:monospace;background:var(--bg);padding:8px;border-radius:6px;word-break:break-all;" id="forgotUidDisplay"></p>
+      </div>
+    </div>
+    <p class="auth-switch"><a id="forgotClose">Back to login</a></p>
   </div>
 </div>
 
@@ -921,6 +968,15 @@
       <option value="facts">Interesting facts</option>
       <option value="surprise">Surprise me</option>
     </select>
+    <div style="border-top:1px solid var(--line);margin:18px 0 14px;"></div>
+    <label style="display:block;font-size:11px;font-weight:700;color:var(--ink);margin-bottom:6px;">Security questions (for password recovery)</label>
+    <div class="auth-error" id="secQError"></div>
+    <div class="auth-success" id="secQSuccess" style="color:#2e7d32;font-size:12px;margin-bottom:6px;min-height:14px;"></div>
+    <select id="profileQ1" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink-strong);font-family:Arial, sans-serif;font-size:13px;"></select>
+    <input id="profileA1" placeholder="Your answer" maxlength="60" style="margin-bottom:10px;">
+    <select id="profileQ2" style="width:100%;margin-bottom:8px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink-strong);font-family:Arial, sans-serif;font-size:13px;"></select>
+    <input id="profileA2" placeholder="Your answer" maxlength="60" style="margin-bottom:10px;">
+    <button class="auth-submit" id="secQSave" style="background:transparent;color:var(--ink);border:1px solid var(--line-strong);">Save security questions</button>
     <p class="auth-switch"><a id="profileCloseLink">Close</a></p>
   </div>
 </div>
@@ -998,6 +1054,12 @@
     <button class="btn" id="reportBannerDismiss">Dismiss</button>
   </div>
 
+  <div id="recoveryBanner" class="report-banner" style="display:none">
+    <span>Set up account recovery so you never get locked out of your account.</span>
+    <button class="btn" id="recoveryBannerBtn">Set it up</button>
+    <button class="btn" id="recoveryBannerDismiss">Remind me later</button>
+  </div>
+
   <div id="viewTracker">
 
   <div class="habits-overview-row" style="display:flex;gap:16px;align-items:flex-start;margin-bottom:8px">
@@ -1035,9 +1097,9 @@
       <svg id="sleepOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible"></svg>
     </div>
     <div class="overview-card" id="thoughtCard" style="flex-shrink:0">
-      <div class="overview-title" id="thoughtCardTitle">Today's Thought</div>
-      <p id="thoughtCardText" style="font-size:14px;line-height:1.5;margin:0 0 10px;color:var(--ink-strong)"></p>
-      <p id="thoughtCardAttribution" style="font-size:11px;color:var(--muted);margin:0;font-style:italic"></p>
+      <div class="overview-title" id="thoughtCardTitle" style="font-size:15px">Today's Thought</div>
+      <p id="thoughtCardText" style="font-size:16px;line-height:1.5;margin:0 0 12px;color:var(--ink-strong)"></p>
+      <p id="thoughtCardAttribution" style="font-size:12px;color:var(--muted);margin:0;font-style:italic"></p>
     </div>
   </div>
   <div class="sleep-summary" id="sleepSummary">Average sleep this month: -</div>
@@ -1121,6 +1183,30 @@ let currentUsername = "";
 function usernameToEmail(username){
   return username.trim().toLowerCase().replace(/\s+/g, "") + "@habittracker.local";
 }
+const SECURITY_QUESTIONS = [
+  "What city were you born in?",
+  "What was the name of your elementary/primary school?",
+  "What street did you grow up on?",
+  "What's your mother's maiden name?",
+  "What was the make/model of your first car?",
+  "What was the name of your first employer?",
+  "What was your high school's mascot?",
+  "In what city did your parents meet?"
+];
+async function hashAnswer(answer){
+  const normalized = (answer || "").trim().toLowerCase();
+  const enc = new TextEncoder().encode(normalized);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+function populateSecurityQuestionSelects(){
+  const q1 = document.getElementById("signupQ1");
+  const q2 = document.getElementById("signupQ2");
+  [q1, q2].forEach(sel => {
+    sel.innerHTML = SECURITY_QUESTIONS.map((q, i) => '<option value="' + i + '">' + q + '</option>').join("");
+  });
+  q2.value = "1";
+}
 function friendlyAuthError(err){
   const code = err.code || "";
   if(code.includes("email-already-in-use")) return "That username is already taken.";
@@ -1135,12 +1221,15 @@ function setAuthMode(mode){
   authMode = mode;
   document.getElementById("authTitle").textContent = mode === "login" ? "Log in" : "Sign up";
   document.getElementById("authSubmit").textContent = mode === "login" ? "Log in" : "Create account";
-  document.querySelector(".auth-switch").innerHTML = mode === "login"
+  document.getElementById("authOverlay").querySelector(".auth-switch").innerHTML = mode === "login"
     ? 'Don\'t have an account? <a id="authSwitchLink">Sign up</a>'
     : 'Already have an account? <a id="authSwitchLink">Log in</a>';
   document.getElementById("authSwitchLink").addEventListener("click", () => {
     setAuthMode(mode === "login" ? "signup" : "login");
   });
+  document.getElementById("signupSecurityQuestions").style.display = mode === "signup" ? "block" : "none";
+  document.getElementById("forgotPasswordRow").style.display = mode === "login" ? "block" : "none";
+  if(mode === "signup") populateSecurityQuestionSelects();
   document.getElementById("authError").textContent = "";
 }
 document.getElementById("authSwitchLink").addEventListener("click", () => setAuthMode("signup"));
@@ -1163,6 +1252,7 @@ document.getElementById("authSubmit").addEventListener("click", async () => {
     errorEl.textContent = "Please fill in both fields.";
     return;
   }
+  let q1Index, q2Index, a1, a2;
   if(authMode === "signup"){
     if(username.length < 3){
       errorEl.textContent = "Username must be at least 3 characters.";
@@ -1182,6 +1272,18 @@ document.getElementById("authSubmit").addEventListener("click", async () => {
       errorEl.textContent = "Password must include both letters and numbers.";
       return;
     }
+    q1Index = document.getElementById("signupQ1").value;
+    q2Index = document.getElementById("signupQ2").value;
+    a1 = document.getElementById("signupA1").value;
+    a2 = document.getElementById("signupA2").value;
+    if(q1Index === q2Index){
+      errorEl.textContent = "Please pick two different security questions.";
+      return;
+    }
+    if(!a1.trim() || !a2.trim()){
+      errorEl.textContent = "Please answer both security questions.";
+      return;
+    }
   }
   const submitBtn = document.getElementById("authSubmit");
   submitBtn.disabled = true;
@@ -1196,6 +1298,12 @@ document.getElementById("authSubmit").addEventListener("click", async () => {
         monthsData: {},
         theme: "light",
         updatedAt: Date.now()
+      });
+      const [hash1, hash2] = await Promise.all([hashAnswer(a1), hashAnswer(a2)]);
+      await setDoc(doc(db, "recovery", username.toLowerCase()), {
+        uid: cred.user.uid,
+        q1: +q1Index, a1Hash: hash1,
+        q2: +q2Index, a2Hash: hash2
       });
     } else {
       await signInWithEmailAndPassword(auth, email, password);
@@ -1214,7 +1322,60 @@ document.getElementById("authSubmit").addEventListener("click", async () => {
 
 document.getElementById("logoutBtn").addEventListener("click", () => signOut(auth));
 
-document.getElementById("profileBtn").addEventListener("click", () => {
+document.getElementById("forgotPasswordLink").addEventListener("click", () => {
+  document.getElementById("authOverlay").style.display = "none";
+  document.getElementById("forgotOverlay").style.display = "flex";
+  document.getElementById("forgotStep1").style.display = "block";
+  document.getElementById("forgotStep2").style.display = "none";
+  document.getElementById("forgotStep3").style.display = "none";
+  document.getElementById("forgotUsername").value = "";
+  document.getElementById("forgotA1").value = "";
+  document.getElementById("forgotA2").value = "";
+  document.getElementById("forgotError").textContent = "";
+});
+document.getElementById("forgotClose").addEventListener("click", () => {
+  document.getElementById("forgotOverlay").style.display = "none";
+  document.getElementById("authOverlay").style.display = "flex";
+});
+
+let forgotRecoveryDoc = null;
+document.getElementById("forgotFindBtn").addEventListener("click", async () => {
+  const errorEl = document.getElementById("forgotError");
+  errorEl.textContent = "";
+  const uname = document.getElementById("forgotUsername").value.trim().toLowerCase();
+  if(!uname){ errorEl.textContent = "Enter your username."; return; }
+  try{
+    const snap = await getDoc(doc(db, "recovery", uname));
+    if(!snap.exists()){
+      errorEl.textContent = "No recovery info found for that username. It may not have been set up yet.";
+      return;
+    }
+    forgotRecoveryDoc = snap.data();
+    document.getElementById("forgotQ1Text").textContent = SECURITY_QUESTIONS[forgotRecoveryDoc.q1];
+    document.getElementById("forgotQ2Text").textContent = SECURITY_QUESTIONS[forgotRecoveryDoc.q2];
+    document.getElementById("forgotStep1").style.display = "none";
+    document.getElementById("forgotStep2").style.display = "block";
+  }catch(err){
+    errorEl.textContent = "Couldn't look that up right now. Please try again.";
+  }
+});
+document.getElementById("forgotVerifyBtn").addEventListener("click", async () => {
+  const errorEl = document.getElementById("forgotError");
+  errorEl.textContent = "";
+  const a1 = document.getElementById("forgotA1").value;
+  const a2 = document.getElementById("forgotA2").value;
+  if(!a1.trim() || !a2.trim()){ errorEl.textContent = "Please answer both questions."; return; }
+  const [h1, h2] = await Promise.all([hashAnswer(a1), hashAnswer(a2)]);
+  if(h1 !== forgotRecoveryDoc.a1Hash || h2 !== forgotRecoveryDoc.a2Hash){
+    errorEl.textContent = "Those answers don't match what we have on file.";
+    return;
+  }
+  document.getElementById("forgotStep2").style.display = "none";
+  document.getElementById("forgotStep3").style.display = "block";
+  document.getElementById("forgotUidDisplay").textContent = "username: " + document.getElementById("forgotUsername").value.trim() + " · uid: " + forgotRecoveryDoc.uid;
+});
+
+document.getElementById("profileBtn").addEventListener("click", async () => {
   document.getElementById("profileNewUsername").value = "";
   document.getElementById("profileNewPassword").value = "";
   document.getElementById("profileCurrentPassword").value = "";
@@ -1222,6 +1383,23 @@ document.getElementById("profileBtn").addEventListener("click", () => {
   document.getElementById("profileSuccess").textContent = "";
   document.getElementById("profileUsernameDisplay").textContent = currentUsername;
   document.getElementById("thoughtPreferenceSelect").value = thoughtPreference;
+  document.getElementById("secQError").textContent = "";
+  document.getElementById("secQSuccess").textContent = "";
+  document.getElementById("profileA1").value = "";
+  document.getElementById("profileA2").value = "";
+  const q1sel = document.getElementById("profileQ1");
+  const q2sel = document.getElementById("profileQ2");
+  [q1sel, q2sel].forEach(sel => {
+    sel.innerHTML = SECURITY_QUESTIONS.map((q, i) => '<option value="' + i + '">' + q + '</option>').join("");
+  });
+  q2sel.value = "1";
+  try{
+    const snap = await getDoc(doc(db, "recovery", currentUsername.toLowerCase()));
+    if(snap.exists()){
+      q1sel.value = snap.data().q1;
+      q2sel.value = snap.data().q2;
+    }
+  }catch(e){ /* no recovery doc yet, defaults are fine */ }
   document.getElementById("profileOverlay").style.display = "flex";
 });
 document.getElementById("profileCloseLink").addEventListener("click", () => {
@@ -1231,6 +1409,29 @@ document.getElementById("thoughtPreferenceSelect").addEventListener("change", e 
   thoughtPreference = e.target.value;
   renderThoughtCard();
   save();
+});
+document.getElementById("secQSave").addEventListener("click", async () => {
+  const errorEl = document.getElementById("secQError");
+  const successEl = document.getElementById("secQSuccess");
+  errorEl.textContent = ""; successEl.textContent = "";
+  const q1 = document.getElementById("profileQ1").value;
+  const q2 = document.getElementById("profileQ2").value;
+  const a1 = document.getElementById("profileA1").value;
+  const a2 = document.getElementById("profileA2").value;
+  if(q1 === q2){ errorEl.textContent = "Please pick two different questions."; return; }
+  if(!a1.trim() || !a2.trim()){ errorEl.textContent = "Please answer both questions."; return; }
+  try{
+    const [h1, h2] = await Promise.all([hashAnswer(a1), hashAnswer(a2)]);
+    await setDoc(doc(db, "recovery", currentUsername.toLowerCase()), {
+      uid: currentUid, q1: +q1, a1Hash: h1, q2: +q2, a2Hash: h2
+    });
+    successEl.textContent = "Security questions saved.";
+    document.getElementById("profileA1").value = "";
+    document.getElementById("profileA2").value = "";
+    document.getElementById("recoveryBanner").style.display = "none";
+  }catch(err){
+    errorEl.textContent = "Couldn't save right now. Please try again.";
+  }
 });
 
 let currentFrequencyHi = null;
@@ -1405,6 +1606,7 @@ onAuthStateChanged(auth, async (user) => {
       }
     }catch(e){ /* ignore */ }
     updateReminderStatusText();
+    checkRecoveryBanner();
     await loadFromFirestore();
   } else {
     currentUid = null;
@@ -1568,24 +1770,26 @@ function renderHabits(){
 
     const labelTd = document.createElement("td");
     labelTd.className = "label-cell";
+    const labelInner = document.createElement("div");
     const input = document.createElement("input");
     input.value = label;
     input.maxLength = 40;
     input.addEventListener("input", e => { habitLabels[hi] = e.target.value.slice(0, 40); save(); });
-    labelTd.appendChild(input);
+    labelInner.appendChild(input);
     if(isHabitPaused(hi, REAL_TODAY)){
       const tag = document.createElement("span");
       tag.className = "paused-tag";
       tag.textContent = "paused";
-      labelTd.appendChild(tag);
+      labelInner.appendChild(tag);
     } else if(habitFrequency[hi] && habitFrequency[hi].type === "weekly-count"){
       const done = computeWeeklyCount(hi, REAL_TODAY);
       const target = habitFrequency[hi].target || 4;
       const tag = document.createElement("span");
       tag.className = "paused-tag";
       tag.textContent = done + "/" + target + " this wk";
-      labelTd.appendChild(tag);
+      labelInner.appendChild(tag);
     }
+    labelTd.appendChild(labelInner);
     tr.appendChild(labelTd);
 
     for(let d=0; d<n; d++){
@@ -1799,7 +2003,7 @@ function renderSleep(){
     body.appendChild(tr);
   });
   updateSleepSummary(md, n);
-  requestAnimationFrame(() => drawSleepOverlay(md, n));
+  requestAnimationFrame(() => requestAnimationFrame(() => drawSleepOverlay(md, n)));
 }
 
 function updateSleepSummary(md, n){
@@ -1822,8 +2026,14 @@ function drawSleepOverlay(md, n){
   const tableRect = table.getBoundingClientRect();
   const gridWidth = table.offsetWidth;
   const gridHeight = table.offsetHeight;
+  if(gridWidth === 0 || gridHeight === 0){
+    // layout not settled yet (common right after a DOM change on mobile) — retry shortly
+    setTimeout(() => drawSleepOverlay(md, n), 150);
+    return;
+  }
   svg.style.width = gridWidth + "px";
   svg.style.height = gridHeight + "px";
+  svg.style.zIndex = "1";
   svg.setAttribute("width", gridWidth);
   svg.setAttribute("height", gridHeight);
   svg.setAttribute("viewBox", "0 0 " + gridWidth + " " + gridHeight);
@@ -1867,6 +2077,12 @@ function drawSleepOverlay(md, n){
 window.addEventListener("resize", () => {
   const md = getMonthData(viewDate);
   drawSleepOverlay(md, daysIn(viewDate));
+});
+window.addEventListener("orientationchange", () => {
+  setTimeout(() => {
+    const md = getMonthData(viewDate);
+    drawSleepOverlay(md, daysIn(viewDate));
+  }, 300);
 });
 
 
@@ -2168,6 +2384,25 @@ document.getElementById("reportBannerDismiss").addEventListener("click", () => {
   const banner = document.getElementById("reportBanner");
   sessionStorage.setItem(banner.dataset.dismissKey, "1");
   banner.style.display = "none";
+});
+
+async function checkRecoveryBanner(){
+  const banner = document.getElementById("recoveryBanner");
+  const dismissKey = "recovery-banner-dismissed-" + currentUid;
+  if(sessionStorage.getItem(dismissKey)){ banner.style.display = "none"; return; }
+  try{
+    const snap = await getDoc(doc(db, "recovery", currentUsername.toLowerCase()));
+    if(snap.exists()){ banner.style.display = "none"; return; }
+  }catch(e){ /* if we can't check, don't nag */ return; }
+  banner.style.display = "flex";
+}
+document.getElementById("recoveryBannerBtn").addEventListener("click", () => {
+  document.getElementById("recoveryBanner").style.display = "none";
+  document.getElementById("profileBtn").click();
+});
+document.getElementById("recoveryBannerDismiss").addEventListener("click", () => {
+  sessionStorage.setItem("recovery-banner-dismissed-" + currentUid, "1");
+  document.getElementById("recoveryBanner").style.display = "none";
 });
 
 // ---------- Smart reminders ----------
